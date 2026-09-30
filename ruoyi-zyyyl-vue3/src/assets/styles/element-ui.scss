@@ -1,0 +1,196 @@
+// cover some element-ui styles
+.el-breadcrumb__inner,
+.el-breadcrumb__inner a {
+  font-weight: 400 !important;
+}
+
+.small-padding {
+  .cell {
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+}
+
+.fixed-width {
+  .el-button--mini {
+    padding: 7px 10px;
+    width: 60px;
+  }
+}
+
+.el-table .fixed-width .el-button--small {
+  padding-left: 0;
+  padding-right: 0;
+  width: inherit;
+}
+
+// 修改 el-dropdown 样式
+.el-dropdown-menu {
+  padding: 6px;
+  border-radius: 10px;
+  border: none;
+
+  .el-dropdown-menu__item {
+    padding: 6px 16px;
+    border-radius: 8px;
+  }
+}
+
+.el-menu--collapse > div > .el-submenu > .el-submenu__title .el-submenu__icon-arrow {
+  display: none;
+}
+
+.el-dropdown .el-dropdown-link {
+  color: var(--el-color-primary) !important;
+}
+
+// 优化菜单折叠展开动画（提升动画流畅度）
+.el-menu.el-menu--inline {
+  transition: max-height 0.26s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+// 优化菜单 item hover 动画（提升鼠标跟手感）
+.el-sub-menu__title,
+.el-menu-item {
+  transition: background-color 0s !important;
+}
+
+// el-message 样式调整
+.el-message {
+  background-color: var(--art-main-bg-color) !important;
+  border: 0 !important;
+  box-shadow:
+    0 6px 16px 0 rgba(0, 0, 0, 0.08),
+    0 3px 6px -4px rgba(0, 0, 0, 0.12),
+    0 9px 28px 8px rgba(0, 0, 0, 0.05) !important;
+
+  p {
+    color: #515a6e !important;
+    font-size: 13px;
+  }
+}
+
+// el-checkbox 样式调整
+.el-checkbox-group {
+  &.el-table-filter__checkbox-group label.el-checkbox {
+    height: 17px !important;
+
+    .el-checkbox__label {
+      font-weight: 400 !important;
+    }
+  }
+}
+
+.el-checkbox {
+  .el-checkbox__inner {
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+
+    &::before {
+      content: "";
+      height: 3px !important;
+      top: 6px !important;
+      background-color: #fff !important;
+      transform: scale(0.6) !important;
+    }
+
+    &::after {
+      width: 4px;
+      height: 8px;
+      margin: auto;
+      border: 2px solid var(--el-checkbox-checked-icon-color);
+      border-left: 0;
+      border-top: 0;
+    }
+  }
+}
+
+// 修改 el-message-box 样式
+.el-message-box {
+  padding: 25px 20px;
+}
+
+.el-form--inline {
+  .el-form-item {
+    .el-select {
+      min-width: 120px;
+    }
+  }
+}
+
+.el-form .el-form-item__label {
+  font-weight: 700;
+}
+
+.el-dialog:not(.is-fullscreen) {
+  margin-top: 6vh !important;
+}
+
+.el-dialog.scrollbar .el-dialog__body {
+  overflow: auto;
+  overflow-x: hidden;
+  max-height: 70vh;
+  padding: 10px 20px 0;
+}
+
+.el-table {
+  .el-table__header-wrapper,
+  .el-table__fixed-header-wrapper {
+    th {
+      word-break: break-word;
+      color: #515a6e;
+      height: 40px !important;
+      font-size: 13px;
+    }
+  }
+  .el-table__body-wrapper {
+    .el-button [class*="el-icon-"] + span {
+      margin-left: 1px;
+    }
+  }
+}
+
+.el-table .el-dropdown-link {
+  cursor: pointer;
+  color: #409eff;
+  margin-left: 10px;
+}
+
+.el-table .el-dropdown,
+.el-icon-arrow-down {
+  font-size: 12px;
+}
+
+.el-tree-node__content > .el-checkbox {
+  margin-right: 8px;
+}
+
+.el-card__header {
+  padding: 14px 15px 7px !important;
+  min-height: 40px;
+}
+
+.el-card__body {
+  padding: 15px 20px 20px 20px !important;
+}
+
+.el-button--cyan.is-active,
+.el-button--cyan:active {
+  background: #20b2aa;
+  border-color: #20b2aa;
+  color: #ffffff;
+}
+
+.el-button--cyan:focus,
+.el-button--cyan:hover {
+  background: #48d1cc;
+  border-color: #48d1cc;
+  color: #ffffff;
+}
+
+.el-button--cyan {
+  background-color: #20b2aa;
+  border-color: #20b2aa;
+  color: #ffffff;
+}

@@ -1,0 +1,63 @@
+# Zyyyl modules config
+# 简单 YAML 结构：modules 列表，每个包含 name / url / path
+
+modules:
+  - name: Zyyyl-Plugin-RabbitMQ
+    url: https://gitee.com/geek-xd/geek-plugin-rabbitmq.git
+    path: zyyyl-plugins/Zyyyl-Plugin-RabbitMQ
+
+  - name: Zyyyl-Plugin-Netty
+    url: https://gitee.com/geek-xd/geek-plugin-netty.git
+    path: zyyyl-plugins/Zyyyl-Plugin-Netty
+
+  - name: Zyyyl-Plugin-Aliyun-OSS
+    url: https://gitee.com/geek-xd/geek-plugin-aliyun-oss.git
+    path: zyyyl-plugins/Zyyyl-Plugin-Aliyun-OSS
+
+  - name: Zyyyl-Plugin-Redis
+    url: https://gitee.com/geek-xd/geek-plugin-redis.git
+    path: zyyyl-plugins/Zyyyl-Plugin-Redis
+
+  - name: Zyyyl-Plugin-Ehcache
+    url: https://gitee.com/geek-xd/geek-plugin-ehcache.git
+    path: zyyyl-plugins/Zyyyl-Plugin-Ehcache
+
+  - name: Zyyyl-Plugin-Minio
+    url: https://gitee.com/geek-xd/geek-plugin-minio.git
+    path: zyyyl-plugins/Zyyyl-Plugin-Minio
+
+  - name: Zyyyl-Plugin-Websocket
+    url: https://gitee.com/geek-xd/geek-plugin-websocket.git
+    path: zyyyl-plugins/Zyyyl-Plugin-Websocket
+
+  - name: Zyyyl-Module-Quartz
+    url: https://gitee.com/geek-xd/geek-module-quartz.git
+    path: zyyyl-modules/Zyyyl-Module-Quartz
+
+  - name: Zyyyl-Module-Online
+    url: https://gitee.com/geek-xd/geek-module-online.git
+    path: zyyyl-modules/Zyyyl-Module-Online
+
+  - name: Zyyyl-Module-Message
+    url: https://gitee.com/geek-xd/geek-module-message.git
+    path: zyyyl-modules/Zyyyl-Module-Message
+
+  - name: Zyyyl-Module-Generator
+    url: https://gitee.com/geek-xd/geek-module-generator.git
+    path: zyyyl-modules/Zyyyl-Module-Generator
+
+  - name: Zyyyl-Module-Form
+    url: https://gitee.com/geek-xd/geek-module-form.git
+    path: zyyyl-modules/Zyyyl-Module-Form
+
+  - name: Zyyyl-Module-Flowable
+    url: https://gitee.com/geek-xd/geek-module-flowable.git
+    path: zyyyl-modules/Zyyyl-Module-Flowable
+
+  - name: Zyyyl-Scene-Pay
+    url: https://gitee.com/geek-xd/geek-scene-pay.git
+    path: zyyyl-scenes/Zyyyl-Scene-Pay
+
+  - name: Zyyyl-Scene-Auth
+    url: https://gitee.com/geek-xd/geek-scene-auth.git
+    path: zyyyl-scenes/Zyyyl-Scene-Auth

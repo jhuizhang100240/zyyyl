@@ -1,0 +1,39 @@
+# Build outputs
+target/
+dist/
+*.class
+*.jar
+*.war
+
+# Dependencies and package stores
+node_modules/
+.pnpm-store/
+pnpm-store/
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.local
+application-local.yml
+.npmrc
+project.private.config.json
+*.pem
+*.p12
+*.key
+
+# Runtime files
+logs/
+*.log
+uploads/
+profile/
+/data/
+
+# IDE and OS files
+.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Generated reference assets
+reference/zzyl-app/common/vendor.js

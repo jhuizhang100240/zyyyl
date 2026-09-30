@@ -1,0 +1,68 @@
+{
+  "name": "ruoyi-zyyyl-vue3",
+  "version": "3.9.1-G",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "modules/*"
+  ],
+  "description": "智颐云养老管理端",
+  "author": "Geek-XD",
+  "license": "MIT",
+  "type": "module",
+  "homepage": "https://gitee.com/geek-xd",
+  "scripts": {
+    "dev": "vite",
+    "build:prod": "vite build",
+    "build:stage": "vite build --mode staging",
+    "preview": "vite preview"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/geek-xd/ruo-yi-vue3-geek.git"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "2.3.2",
+    "@ruoyi/core": "workspace:*",
+    "@ruoyi/ui": "workspace:*",
+    "@vueuse/core": "14.3.0",
+    "axios": "1.16.0",
+    "crypto-js": "^4.2.0",
+    "diagram-js": "^15.3.0",
+    "echarts": "6.0.0",
+    "element-plus": "2.14.0",
+    "fast-glob": "^3.3.3",
+    "fuse.js": "7.1.0",
+    "highlight.js": "11.11.1",
+    "inherits": "^2.0.4",
+    "jsbarcode": "^3.12.1",
+    "jsencrypt": "3.5.4",
+    "min-dash": "5.0.0",
+    "nprogress": "0.2.0",
+    "pinia": "3.0.4",
+    "qrcode": "^1.5.4",
+    "quill": "^2.0.2",
+    "quill-better-table": "^1.2.10",
+    "uuid": "14.0.0",
+    "vue": "3.5.34",
+    "vue-cropper": "1.1.1",
+    "vue-router": "5.0.6"
+  },
+  "devDependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "@types/nprogress": "^0.2.3",
+    "@vitejs/plugin-vue": "6.0.6",
+    "@vue/compiler-sfc": "3.5.34",
+    "sass": "1.99.0",
+    "tslib": "^2.7.0",
+    "unplugin-auto-import": "21.0.0",
+    "vite": "8.0.12",
+    "vite-plugin-compression": "0.5.1",
+    "vite-plugin-glsl": "1.6.0",
+    "vite-plugin-svg-icons": "2.0.1",
+    "vite-plugin-vue-setup-extend": "0.4.0"
+  }
+}
