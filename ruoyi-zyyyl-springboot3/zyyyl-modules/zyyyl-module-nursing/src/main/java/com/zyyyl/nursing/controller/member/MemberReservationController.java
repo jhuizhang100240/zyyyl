@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.zyyyl.common.core.domain.AjaxResult;
 import com.zyyyl.common.core.domain.R;
 import com.zyyyl.common.core.page.TableDataInfo;
-import com.zyyyl.common.utils.SecurityUtils;
 import com.zyyyl.nursing.domain.Reservation;
 import com.zyyyl.nursing.dto.ReservationDto;
 import com.zyyyl.nursing.service.IReservationService;
+import com.zyyyl.nursing.service.MemberLoginService;
 import com.zyyyl.nursing.vo.TimeCountVo;
 
 @RestController
@@ -28,9 +28,12 @@ public class MemberReservationController {
     @Autowired
     private IReservationService reservationService;
 
+    @Autowired
+    private MemberLoginService memberLoginService;
+
     @GetMapping("/cancelled-count")
     public AjaxResult cancelledCount() {
-        return AjaxResult.success(reservationService.cancelledCount(SecurityUtils.getUserId()));
+        return AjaxResult.success(reservationService.cancelledCount(memberLoginService.currentMemberId()));
     }
 
     @GetMapping("/countByTime")
@@ -40,7 +43,7 @@ public class MemberReservationController {
 
     @PostMapping
     public AjaxResult insertReservation(@RequestBody ReservationDto dto) {
-        return AjaxResult.success(reservationService.insertReservation(dto, SecurityUtils.getUserId()));
+        return AjaxResult.success(reservationService.insertReservation(dto, memberLoginService.currentMemberId()));
     }
 
     @GetMapping("/page")
@@ -48,13 +51,13 @@ public class MemberReservationController {
             @RequestParam(defaultValue = "10") Integer pageSize,
             Integer status) {
         TableDataInfo<Reservation> page = reservationService.selectByPage(
-                pageNum, pageSize, status, SecurityUtils.getUserId());
+                pageNum, pageSize, status, memberLoginService.currentMemberId());
         return AjaxResult.success(page);
     }
 
     @PutMapping("/{id}/cancel")
     public AjaxResult cancel(@PathVariable Long id) {
-        reservationService.cancelReservation(id, SecurityUtils.getUserId());
+        reservationService.cancelReservation(id, memberLoginService.currentMemberId());
         return AjaxResult.success();
     }
 }

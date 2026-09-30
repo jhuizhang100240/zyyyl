@@ -33,6 +33,9 @@ public interface ReservationMapper extends BaseMapper<Reservation> {
 
     List<Reservation> selectExpired(@Param("now") LocalDateTime now);
 
+    List<Reservation> selectByDate(@Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime);
+
     List<TimeCountVo> getCountByTime(@Param("startTime") LocalDateTime startTime,
             @Param("endTime") LocalDateTime endTime);
 

@@ -3,6 +3,7 @@ package com.zyyyl.nursing.service;
 import java.util.List;
 
 import com.mybatisflex.core.service.IService;
+import com.zyyyl.common.core.page.TableDataInfo;
 import com.zyyyl.nursing.domain.NursingProject;
 import com.zyyyl.nursing.vo.NursingProjectVo;
 
@@ -21,4 +22,9 @@ public interface INursingProjectService extends IService<NursingProject> {
     int deleteNursingProjectById(Long id);
 
     List<NursingProjectVo> listAll();
+
+    /**
+     * 家属端分页查询护理项目
+     */
+    TableDataInfo selectMemberPage(Integer pageNum, Integer pageSize, String name);
 }

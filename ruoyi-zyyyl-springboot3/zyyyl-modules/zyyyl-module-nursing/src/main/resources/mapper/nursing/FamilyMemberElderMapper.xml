@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.FamilyMemberElderMapper">
+
+    <resultMap id="FamilyMemberElderResult" type="com.zyyyl.nursing.vo.FamilyMemberElderVo">
+        <id property="id" column="id"/>
+        <result property="familyMemberId" column="family_member_id"/>
+        <result property="elderId" column="elder_id"/>
+        <result property="elderName" column="elder_name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="selectByMemberId" resultMap="FamilyMemberElderResult">
+        select f.id,
+               f.family_member_id,
+               f.elder_id,
+               e.name as elder_name,
+               f.create_time,
+               f.update_time,
+               f.create_by,
+               f.update_by,
+               f.remark
+        from family_member_elder f
+        left join elder e on f.elder_id = e.id
+        where f.family_member_id = #{familyMemberId}
+        order by f.id desc
+    </select>
+
+    <select id="selectBindingsByPage" resultType="com.zyyyl.nursing.vo.MemberElderListVo">
+        select f.id,
+               f.elder_id,
+               e.name as elder_name,
+               e.sex,
+               e.status,
+               e.bed_number,
+               c.nursing_level_name,
+               timestampdiff(year, str_to_date(e.birthday, '%Y-%m-%d'), curdate()) as age
+        from family_member_elder f
+        left join elder e on f.elder_id = e.id
+        left join check_in c on c.elder_id = e.id and c.status = 0
+        where f.family_member_id = #{familyMemberId}
+        order by f.id desc
+    </select>
+
+</mapper>

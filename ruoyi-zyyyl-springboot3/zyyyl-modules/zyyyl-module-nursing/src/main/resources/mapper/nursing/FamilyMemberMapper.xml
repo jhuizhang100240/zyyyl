@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.FamilyMemberMapper">
+
+    <resultMap id="FamilyMemberResult" type="com.zyyyl.nursing.domain.FamilyMember">
+        <id property="id" column="id"/>
+        <result property="phone" column="phone"/>
+        <result property="name" column="name"/>
+        <result property="avatar" column="avatar"/>
+        <result property="openId" column="open_id"/>
+        <result property="gender" column="gender"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="familyMemberColumns">
+        id, phone, name, avatar, open_id, gender,
+        create_time, update_time, create_by, update_by, remark
+    </sql>
+
+    <select id="selectByOpenId" resultMap="FamilyMemberResult">
+        select <include refid="familyMemberColumns"/>
+        from family_member
+        where open_id = #{openId}
+        limit 1
+    </select>
+
+    <select id="selectByPhone" resultMap="FamilyMemberResult">
+        select <include refid="familyMemberColumns"/>
+        from family_member
+        where phone = #{phone}
+        limit 1
+    </select>
+
+</mapper>

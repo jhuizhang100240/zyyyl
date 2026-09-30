@@ -96,6 +96,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           and status = 0
     </select>
 
+    <select id="selectByDate" resultMap="ReservationResult">
+        select <include refid="reservationColumns"/>
+        from reservation
+        where time &gt;= #{startTime}
+          and time &lt; #{endTime}
+        order by time
+    </select>
+
     <select id="getCountByTime" resultType="com.zyyyl.nursing.vo.TimeCountVo">
         select time, 6 - count(1) as count
         from reservation

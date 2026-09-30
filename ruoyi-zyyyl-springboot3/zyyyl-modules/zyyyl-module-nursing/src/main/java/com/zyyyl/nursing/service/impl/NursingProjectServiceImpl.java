@@ -5,7 +5,10 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
+import com.zyyyl.common.core.page.TableDataInfo;
 import com.zyyyl.common.exception.ServiceException;
 import com.zyyyl.nursing.domain.NursingProject;
 import com.zyyyl.nursing.mapper.NursingProjectMapper;
@@ -54,6 +57,23 @@ public class NursingProjectServiceImpl extends ServiceImpl<NursingProjectMapper,
     @Override
     public List<NursingProjectVo> listAll() {
         return mapper.listAll();
+    }
+
+    @Override
+    public TableDataInfo selectMemberPage(Integer pageNum, Integer pageSize, String name) {
+        int pageNo = pageNum == null || pageNum < 1 ? 1 : pageNum;
+        int size = pageSize == null || pageSize < 1 ? 10 : Math.min(pageSize, 100);
+        PageHelper.startPage(pageNo, size);
+        NursingProject query = new NursingProject();
+        query.setName(name);
+        List<NursingProject> list = mapper.selectNursingProjectList(query);
+        Page<NursingProject> page = (Page<NursingProject>) list;
+        TableDataInfo result = new TableDataInfo();
+        result.setCode(200);
+        result.setMsg("请求成功");
+        result.setRows(page.getResult());
+        result.setTotal(page.getTotal());
+        return result;
     }
 
     private void validate(NursingProject nursingProject) {

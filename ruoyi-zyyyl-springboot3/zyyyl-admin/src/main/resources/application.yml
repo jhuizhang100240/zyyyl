@@ -7,7 +7,7 @@ zyyyl:
   # 版权年份
   copyrightYear: 2026
   # 文件路径 示例（ Windows配置D:/zyyyl/uploadPath，Linux配置 /home/zyyyl/uploadPath）
-  profile: D:/zyyyl/uploadPath
+  profile: ${UPLOAD_PATH:D:/zyyyl/uploadPath}
   # 获取ip地址开关
   addressEnabled: false
   # 验证码类型 math 数组计算 char 字符验证
@@ -20,10 +20,29 @@ zyyyl:
     reservation-cron: ${ZYYYL_RESERVATION_CRON:0 1,31 * * * *}
     contract-cron: ${ZYYYL_CONTRACT_CRON:0 0 1 * * *}
 
+# 微信小程序配置，AppSecret 只从环境变量读取
+wechat:
+  miniapp:
+    app-id: ${WECHAT_MINIAPP_APP_ID:}
+    app-secret: ${WECHAT_MINIAPP_APP_SECRET:}
+
+# Dify 配置，Token 只从环境变量读取
+dify:
+  base-url: ${DIFY_BASE_URL:http://192.168.100.128/v1}
+  token: ${DIFY_TOKEN:}
+  timeout-seconds: ${DIFY_TIMEOUT_SECONDS:120}
+  conversation-limit: ${DIFY_CONVERSATION_LIMIT:20}
+  # Dify 工具调用本应用时使用的服务 Token，留空则不校验 Token，仅校验来源IP
+  serve-token: ${DIFY_SERVE_TOKEN:}
+  serve-allowed-ips:
+    - 127.0.0.1
+    - ::1
+    - 192.168.100.128
+
 # 开发环境配置
 server:
   # 服务器的HTTP端口，默认为8080
-  port: 8080
+  port: ${SERVER_PORT:8080}
   servlet:
     # 应用的访问路径
     context-path: /
@@ -121,7 +140,7 @@ xss:
 
 security:
   # 白名单配置，多个用逗号分隔
-  whitList: /login,/register,/captchaImage,/swagger-ui/**,/swagger-resources/**,/webjars/**,/druid/**,/*/api-docs/**,/websocket/**
+  whitList: /login,/register,/captchaImage,/error,/swagger-ui/**,/swagger-resources/**,/webjars/**,/druid/**,/*/api-docs/**,/websocket/**
 
 # PageHelper分页插件
 pagehelper:
