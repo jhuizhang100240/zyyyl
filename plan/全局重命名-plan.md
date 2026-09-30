@@ -8,9 +8,9 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 当前阶段 | R-10：编译和提交 |
+| 当前阶段 | 前置阶段 R：完成，等待用户确认进入后端阶段一 |
 | 最后更新 | 2026-09-30 |
-| 下一项任务 | 将后端、管理端、小程序和参考目录改为最终名称 |
+| 下一项任务 | 后端阶段一：Spring Boot 3 骨架与接口冻结 |
 
 ## 一、最终命名映射
 
@@ -109,7 +109,7 @@
 - [x] 工作区使用 `zyyyl-family-uniapp`。
 - [x] 应用名称统一为“智颐云养老”。
 - [x] API 环境变量使用 `zyyyl` 命名。
-- [ ] 从 `reference/zzyl-app` 恢复页面，不直接编辑编译产物。
+- [ ] 从 `reference/zzyl-app` 恢复页面，不直接编辑编译产物；该验证延后至家属端阶段五，不阻塞重命名基线。
 
 **验收**：微信开发者工具可编译首页。
 
@@ -118,7 +118,8 @@
 - [x] 从 `reference/zzyl/sql/zzyl.sql` 提取 DDL。
 - [x] 将 `zzyl` schema 改为 `zyyyl`。
 - [x] 清理全部 INSERT 和真实个人数据。
-- [ ] 生成脱敏演示数据并在 MySQL 8.0 执行初始化，待数据库密码提供后验证。
+- [x] 已在 MySQL 8.0 执行 `zyyyl` 业务表结构初始化（19 张养老业务表；`sys_*` 由 Liquibase 管理）。
+- [ ] 脱敏演示数据的生成与导入延后至后端阶段六。
 - [ ] 将 DDL 转换为 Liquibase changeSet，安排在后端阶段六。
 
 **验收**：MySQL 8.0 可创建 `zyyyl` 并完成初始化。
@@ -141,9 +142,11 @@ rg -n -S "com\.geek|geek-admin|geek-common|geek-framework|geek-system|geek-modul
 
 - [x] JDK 21 执行 Maven 全模块编译和打包成功。
 - [x] 管理端执行生产构建成功。
-- [ ] 后端执行启动和登录冒烟测试；等待 `plan/待确认项.md` P4 提供数据库和 Redis 密码。
-- [ ] Git 提交信息：`refactor: rename local geek identifiers to zyyyl`。
-- [ ] 推送到 `origin/main`；当前本地提交 `8553b1e` 已完成，但 GitHub `443` 连接两次失败，等待网络恢复。
+- [x] 后端执行启动和登录冒烟测试通过：MySQL、Redis、Liquibase 均正常，`/login`、`/getInfo`、`/getRouters` 返回 200。
+- [x] Git 提交已完成：`3f5b77c refactor: rename local geek identifiers to zyyyl`、`332f208 docs(plan): record rename verification status`、`5a3ce26 fix(backend): finish zyyyl baseline startup`。
+- [x] 已推送 `origin/main`；GitHub 密钥扫描拦截后，已将仅作本地迁移参考的 `reference/` 从 Git 历史移除并加入忽略规则。
+
+说明：`reference/` 仍保留在本机工作区，未提交到远程仓库；重写前历史已备份为 `D:\develop\code\zyyyl-before-secret-scrub.bundle`。
 
 **验收**：重命名阶段单独提交，业务迁移尚未混入。
 
@@ -170,3 +173,6 @@ rg -n -S "com\.geek|geek-admin|geek-common|geek-framework|geek-system|geek-modul
 | 2026-09-30 | R-09 | 已完成 | 本地旧命名残留检查和例外确认完成 |
 | 2026-09-30 | R-10 | 进行中 | Maven 打包和前端构建成功，启动冒烟、Git 提交和推送待执行 |
 | 2026-09-30 | R-10 | 部分完成 | 本地提交 `8553b1e` 已创建；GitHub HTTPS 连接被重置，推送待网络恢复 |
+| 2026-09-30 | R-10 | 已完成 | MySQL、Redis 和 Liquibase 启动成功；使用临时验证码完成管理员登录，`/login`、`/getInfo`、`/getRouters`、系统菜单查询均返回 200 |
+| 2026-09-30 | R-10 | 已完成 | 提交 `5a3ce26` 完成基线启动修复；`reference/` 历史已移除并以本地参考目录和 bundle 备份保留 |
+| 2026-09-30 | R-10 | 已完成 | `origin/main` 推送成功，远程分支已建立 |
