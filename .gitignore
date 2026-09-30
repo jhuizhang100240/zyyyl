@@ -35,5 +35,5 @@ profile/
 .DS_Store
 Thumbs.db
 
-# Generated reference assets
-reference/zzyl-app/common/vendor.js
+# Local migration reference (kept on disk, never published)
+/reference/
