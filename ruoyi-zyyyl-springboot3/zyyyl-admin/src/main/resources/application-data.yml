@@ -28,6 +28,13 @@ storage:
 
 # 数据池配置
 spring:
+  liquibase:
+    # Development/test environments may run the changelog automatically.
+    # Production must set SPRING_LIQUIBASE_ENABLED=false or use a controlled release process.
+    enabled: ${SPRING_LIQUIBASE_ENABLED:true}
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    contexts: ${SPRING_LIQUIBASE_CONTEXTS:dev}
+    drop-first: false
   datasource:
     dynamic:
       primary: MASTER

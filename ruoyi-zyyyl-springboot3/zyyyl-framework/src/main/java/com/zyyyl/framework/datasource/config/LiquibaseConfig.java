@@ -1,10 +1,12 @@
 package com.zyyyl.framework.datasource.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.util.StringUtils;
 
 import com.zyyyl.framework.datasource.properties.DynamicDataSourceProperties;
 
@@ -15,6 +17,15 @@ public class LiquibaseConfig {
 
     @Autowired
     private DynamicDataSourceProperties dataSourceProperties;
+
+    @Value("${spring.liquibase.enabled:true}")
+    private boolean enabled;
+
+    @Value("${spring.liquibase.contexts:}")
+    private String contexts;
+
+    @Value("${spring.liquibase.drop-first:false}")
+    private boolean dropFirst;
 
     @Bean
     public SpringLiquibase liquibase() {
@@ -28,7 +39,11 @@ public class LiquibaseConfig {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(nativeDs);
         liquibase.setChangeLog("classpath:db/changelog/db.changelog-master.yaml");
-        liquibase.setShouldRun(true);
+        liquibase.setShouldRun(enabled);
+        liquibase.setDropFirst(dropFirst);
+        if (StringUtils.hasText(contexts)) {
+            liquibase.setContexts(contexts);
+        }
         return liquibase;
     }
 }
