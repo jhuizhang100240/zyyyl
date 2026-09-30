@@ -1,6 +1,7 @@
 package com.zyyyl.framework.mybatis;
 
 import com.zyyyl.common.core.domain.BaseEntity;
+import com.zyyyl.common.core.domain.UserIdAuditEntity;
 import com.zyyyl.common.utils.DateUtils;
 import com.zyyyl.common.utils.SecurityUtils;
 import com.mybatisflex.annotation.InsertListener;
@@ -18,7 +19,7 @@ public class BaseEntityListener implements InsertListener, UpdateListener {
         if (SecurityUtils.isAnonymous()) {
             entity.setUpdateBy(null);
         } else {
-            entity.setUpdateBy(SecurityUtils.getUsername());
+            entity.setUpdateBy(resolveAuditOperator(entity));
         }
     }
 
@@ -32,8 +33,15 @@ public class BaseEntityListener implements InsertListener, UpdateListener {
         if (SecurityUtils.isAnonymous()) {
             entity.setCreateBy(null);
         } else {
-            entity.setCreateBy(SecurityUtils.getUsername());
+            entity.setCreateBy(resolveAuditOperator(entity));
         }
     }
 
+    private String resolveAuditOperator(BaseEntity entity) {
+        if (entity instanceof UserIdAuditEntity) {
+            Long userId = SecurityUtils.getUserId();
+            return userId == null ? null : userId.toString();
+        }
+        return SecurityUtils.getUsername();
+    }
 }

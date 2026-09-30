@@ -12,7 +12,6 @@ import com.mybatisflex.core.FlexGlobalConfig;
 import com.mybatisflex.core.FlexGlobalConfig.KeyConfig;
 import com.mybatisflex.core.dialect.DbType;
 import com.mybatisflex.core.dialect.DialectFactory;
-import com.mybatisflex.core.keygen.KeyGenerators;
 import com.mybatisflex.spring.boot.MyBatisFlexCustomizer;
 
 @Configuration
@@ -23,9 +22,8 @@ public class MybatisFlexConfig {
     @ConditionalOnMissingBean(FlexGlobalConfig.KeyConfig.class)
     public FlexGlobalConfig.KeyConfig keyConfig() {
         FlexGlobalConfig.KeyConfig keyConfig = new FlexGlobalConfig.KeyConfig();
-        keyConfig.setKeyType(KeyType.Generator);
-        keyConfig.setValue(KeyGenerators.flexId);
-        keyConfig.setBefore(true);
+        keyConfig.setKeyType(KeyType.Auto);
+        keyConfig.setBefore(false);
         return keyConfig;
     }
 
