@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.CheckInMapper">
+
+    <resultMap id="CheckInResult" type="com.zyyyl.nursing.domain.CheckIn">
+        <id property="id" column="id"/>
+        <result property="elderName" column="elder_name"/>
+        <result property="elderId" column="elder_id"/>
+        <result property="idCardNo" column="id_card_no"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+        <result property="nursingLevelName" column="nursing_level_name"/>
+        <result property="bedNumber" column="bed_number"/>
+        <result property="status" column="status"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="selectCheckInList" parameterType="com.zyyyl.nursing.domain.CheckIn" resultMap="CheckInResult">
+        select id, elder_name, elder_id, id_card_no, start_date, end_date,
+               nursing_level_name, bed_number, status, sort_order, remark,
+               create_by, create_time, update_by, update_time
+        from check_in
+        <where>
+            <if test="elderName != null and elderName != ''">and elder_name like concat('%', #{elderName}, '%')</if>
+            <if test="elderId != null">and elder_id = #{elderId}</if>
+            <if test="idCardNo != null and idCardNo != ''">and id_card_no = #{idCardNo}</if>
+            <if test="startDate != null">and start_date = #{startDate}</if>
+            <if test="endDate != null">and end_date = #{endDate}</if>
+            <if test="nursingLevelName != null and nursingLevelName != ''">
+                and nursing_level_name like concat('%', #{nursingLevelName}, '%')
+            </if>
+            <if test="bedNumber != null and bedNumber != ''">and bed_number = #{bedNumber}</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="sortOrder != null">and sort_order = #{sortOrder}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <update id="updateHealthAssessmentStatus">
+        update health_assessment
+        set admission_status = 0
+        where id_card = #{idCardNo}
+          and admission_status = 1
+    </update>
+
+</mapper>

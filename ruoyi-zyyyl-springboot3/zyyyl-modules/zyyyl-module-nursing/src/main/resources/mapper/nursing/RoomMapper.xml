@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.RoomMapper">
+
+    <resultMap id="RoomResult" type="com.zyyyl.nursing.domain.Room">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="sort" column="sort"/>
+        <result property="roomTypeId" column="room_type_id"/>
+        <result property="floorId" column="floor_id"/>
+        <result property="isDeleted" column="is_deleted"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="selectRoomList" parameterType="com.zyyyl.nursing.domain.Room" resultMap="RoomResult">
+        select id, code, sort, room_type_id, floor_id, is_deleted,
+               create_by, create_time, update_by, update_time, remark
+        from room
+        <where>
+            <if test="code != null and code != ''">and code = #{code}</if>
+            <if test="sort != null">and sort = #{sort}</if>
+            <if test="roomTypeId != null">and room_type_id = #{roomTypeId}</if>
+            <if test="floorId != null">and floor_id = #{floorId}</if>
+            <if test="isDeleted != null">and is_deleted = #{isDeleted}</if>
+        </where>
+        order by sort, id
+    </select>
+
+    <resultMap id="roomVoResultMap" type="com.zyyyl.nursing.vo.RoomVo">
+        <id property="id" column="id"/>
+        <result property="code" column="code"/>
+        <result property="floorId" column="floor_id"/>
+        <result property="floorName" column="floor_name"/>
+        <result property="price" column="price"/>
+        <collection property="bedVoList" ofType="com.zyyyl.nursing.vo.BedVo">
+            <id property="id" column="bed_id"/>
+            <result property="bedNumber" column="bed_number"/>
+            <result property="bedStatus" column="bed_status"/>
+            <result property="roomId" column="room_id"/>
+            <result property="ename" column="elder_name"/>
+            <result property="elderId" column="elder_id"/>
+        </collection>
+    </resultMap>
+
+    <select id="selectByFloorId" resultMap="roomVoResultMap">
+        select r.id,
+               r.code,
+               r.floor_id,
+               f.name as floor_name,
+               rt.price,
+               b.id as bed_id,
+               b.bed_number,
+               b.bed_status,
+               b.room_id,
+               e.name as elder_name,
+               e.id as elder_id
+        from room r
+        left join floor f on f.id = r.floor_id
+        left join room_type rt on rt.id = r.room_type_id
+        left join bed b on b.room_id = r.id
+        left join elder e on e.bed_id = b.id
+        where r.floor_id = #{floorId}
+        order by r.sort, r.id, b.sort, b.id
+    </select>
+
+    <select id="getRoomById" resultType="com.zyyyl.nursing.vo.RoomVo">
+        select f.name as floorName,
+               f.id as floorId,
+               r.id as roomId,
+               r.code,
+               rt.price
+        from floor f
+        left join room r on f.id = r.floor_id
+        left join room_type rt on r.room_type_id = rt.id
+        where r.id = #{id}
+    </select>
+
+    <select id="selectByFloorIdWithNur" resultMap="roomVoResultMap">
+        select r.id,
+               r.code,
+               r.floor_id,
+               f.name as floor_name,
+               rt.price,
+               b.id as bed_id,
+               b.bed_number,
+               b.bed_status,
+               b.room_id,
+               e.name as elder_name,
+               e.id as elder_id
+        from room r
+        left join floor f on f.id = r.floor_id
+        left join room_type rt on rt.id = r.room_type_id
+        join bed b on b.room_id = r.id
+        join elder e on e.bed_id = b.id
+        where r.floor_id = #{floorId}
+        order by r.sort, r.id, b.sort, b.id
+    </select>
+
+</mapper>

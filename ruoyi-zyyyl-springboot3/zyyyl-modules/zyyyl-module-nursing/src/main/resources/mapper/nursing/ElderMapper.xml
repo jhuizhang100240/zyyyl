@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.ElderMapper">
+
+    <resultMap id="ElderResult" type="com.zyyyl.nursing.domain.Elder">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="image" column="image"/>
+        <result property="idCardNo" column="id_card_no"/>
+        <result property="sex" column="sex"/>
+        <result property="status" column="status"/>
+        <result property="phone" column="phone"/>
+        <result property="birthday" column="birthday"/>
+        <result property="address" column="address"/>
+        <result property="idCardNationalEmblemImg" column="id_card_national_emblem_img"/>
+        <result property="idCardPortraitImg" column="id_card_portrait_img"/>
+        <result property="bedNumber" column="bed_number"/>
+        <result property="bedId" column="bed_id"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="elderColumns">
+        id, name, image, id_card_no, sex, status, phone, birthday, address,
+        id_card_national_emblem_img, id_card_portrait_img, bed_number, bed_id,
+        create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="selectElderList" parameterType="com.zyyyl.nursing.domain.Elder" resultMap="ElderResult">
+        select <include refid="elderColumns"/>
+        from elder
+        <where>
+            <if test="name != null and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="image != null and image != ''">and image = #{image}</if>
+            <if test="idCardNo != null and idCardNo != ''">and id_card_no = #{idCardNo}</if>
+            <if test="sex != null">and sex = #{sex}</if>
+            <if test="status != null">and status = #{status}</if>
+            <if test="phone != null and phone != ''">and phone = #{phone}</if>
+            <if test="birthday != null and birthday != ''">and birthday = #{birthday}</if>
+            <if test="address != null and address != ''">and address = #{address}</if>
+            <if test="bedNumber != null and bedNumber != ''">and bed_number = #{bedNumber}</if>
+            <if test="bedId != null">and bed_id = #{bedId}</if>
+        </where>
+        order by id desc
+    </select>
+
+    <select id="selectElderByIdCardAndStatusForUpdate" resultMap="ElderResult">
+        select <include refid="elderColumns"/>
+        from elder
+        where id_card_no = #{idCardNo}
+          and status = #{status}
+        limit 1
+        for update
+    </select>
+
+</mapper>

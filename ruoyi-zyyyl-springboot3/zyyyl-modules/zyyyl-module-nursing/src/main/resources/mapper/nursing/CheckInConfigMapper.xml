@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.CheckInConfigMapper">
+
+    <resultMap id="CheckInConfigResult" type="com.zyyyl.nursing.domain.CheckInConfig">
+        <id property="id" column="id"/>
+        <result property="checkInId" column="check_in_id"/>
+        <result property="nursingLevelId" column="nursing_level_id"/>
+        <result property="nursingLevelName" column="nursing_level_name"/>
+        <result property="feeStartDate" column="fee_start_date"/>
+        <result property="feeEndDate" column="fee_end_date"/>
+        <result property="deposit" column="deposit"/>
+        <result property="nursingFee" column="nursing_fee"/>
+        <result property="bedFee" column="bed_fee"/>
+        <result property="insurancePayment" column="insurance_payment"/>
+        <result property="governmentSubsidy" column="government_subsidy"/>
+        <result property="otherFees" column="other_fees"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+    </resultMap>
+
+    <select id="selectByCheckInId" resultMap="CheckInConfigResult">
+        select id, check_in_id, nursing_level_id, nursing_level_name,
+               fee_start_date, fee_end_date, deposit, nursing_fee, bed_fee,
+               insurance_payment, government_subsidy, other_fees, sort_order,
+               remark, create_by, create_time, update_by, update_time
+        from check_in_config
+        where check_in_id = #{checkInId}
+        limit 1
+    </select>
+
+</mapper>

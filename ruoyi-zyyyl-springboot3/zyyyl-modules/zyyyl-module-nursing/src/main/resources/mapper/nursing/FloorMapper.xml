@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.FloorMapper">
+
+    <resultMap id="FloorResult" type="com.zyyyl.nursing.domain.Floor">
+        <id property="id" column="id"/>
+        <result property="name" column="name"/>
+        <result property="code" column="code"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <sql id="floorColumns">
+        id, name, code, create_by, create_time, update_by, update_time, remark
+    </sql>
+
+    <select id="selectFloorList" parameterType="com.zyyyl.nursing.domain.Floor" resultMap="FloorResult">
+        select <include refid="floorColumns"/>
+        from floor
+        <where>
+            <if test="name != null and name != ''">and name like concat('%', #{name}, '%')</if>
+            <if test="code != null">and code = #{code}</if>
+        </where>
+        order by code, id
+    </select>
+
+    <resultMap id="treeVoResultMap" type="com.zyyyl.nursing.vo.TreeVo">
+        <id property="value" column="floor_id"/>
+        <result property="label" column="floor_name"/>
+        <collection property="children" ofType="com.zyyyl.nursing.vo.TreeVo">
+            <id property="value" column="room_id"/>
+            <result property="label" column="room_code"/>
+            <collection property="children" ofType="com.zyyyl.nursing.vo.TreeVo">
+                <id property="value" column="bed_id"/>
+                <result property="label" column="bed_number"/>
+            </collection>
+        </collection>
+    </resultMap>
+
+    <select id="getRoomAndBedByBedStatus" resultMap="treeVoResultMap">
+        select f.id as floor_id,
+               f.name as floor_name,
+               r.id as room_id,
+               r.code as room_code,
+               b.id as bed_id,
+               b.bed_number
+        from floor f
+        join room r on r.floor_id = f.id
+        join bed b on b.room_id = r.id
+        where b.bed_status = #{status}
+        order by f.id, r.id, b.id
+    </select>
+
+    <select id="selectAllByNur" resultMap="FloorResult">
+        select distinct f.id,
+               f.name,
+               f.code,
+               f.create_by,
+               f.create_time,
+               f.update_by,
+               f.update_time,
+               f.remark
+        from floor f
+        join room r on r.floor_id = f.id
+        join bed b on b.room_id = r.id
+        where b.bed_status = 1
+        order by f.code, f.create_time desc
+    </select>
+
+</mapper>
