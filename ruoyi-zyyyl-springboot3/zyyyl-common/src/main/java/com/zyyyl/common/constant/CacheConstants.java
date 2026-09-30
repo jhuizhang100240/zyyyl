@@ -9,6 +9,12 @@ public class CacheConstants {
     /** 登录用户 redis key */
     public static final String LOGIN_TOKEN_KEY = "login_tokens";
 
+    /** 家属端登录用户 redis key，与后台登录态隔离 */
+    public static final String MEMBER_LOGIN_TOKEN_KEY = "member_login_tokens";
+
+    /** 家属端一次性绑定票据 redis key */
+    public static final String MEMBER_BIND_TICKET_KEY = "member_bind_tickets";
+
     /** 验证码 redis key */
     public static final String CAPTCHA_CODE_KEY = "captcha_codes";
 

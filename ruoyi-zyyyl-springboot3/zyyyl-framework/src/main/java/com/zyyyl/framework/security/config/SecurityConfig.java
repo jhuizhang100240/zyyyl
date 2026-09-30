@@ -21,6 +21,7 @@ import org.springframework.web.filter.CorsFilter;
 
 import com.zyyyl.framework.processor.PermitAllUrlProperties;
 import com.zyyyl.framework.security.filter.JwtAuthenticationTokenFilter;
+import com.zyyyl.framework.security.filter.MemberTokenAuthenticationFilter;
 import com.zyyyl.framework.security.handle.AuthenticationEntryPointImpl;
 import com.zyyyl.framework.security.handle.LogoutSuccessHandlerImpl;
 
@@ -44,6 +45,10 @@ public class SecurityConfig {
     /** token认证过滤器 */
     @Autowired
     private JwtAuthenticationTokenFilter authenticationTokenFilter;
+
+    /** 家属端 token 认证过滤器 */
+    @Autowired
+    private MemberTokenAuthenticationFilter memberTokenAuthenticationFilter;
 
     /** 跨域过滤器 */
     @Autowired
@@ -85,6 +90,9 @@ public class SecurityConfig {
                 // 基于token，所以不需要session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
+                        // SSE 等异步请求结束后容器会转发到 /error，允许 ERROR/ASYNC 型转发避免二次鉴权
+                        .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR,
+                                jakarta.servlet.DispatcherType.ASYNC).permitAll()
                         // 白名单允许匿名访问的url
                         .requestMatchers(WHIT_LIST.split(",")).permitAll()
                         // 注解标记允许匿名访问的url
@@ -97,6 +105,8 @@ public class SecurityConfig {
                 .logout(logout -> logout.logoutUrl("/logout").logoutSuccessHandler(logoutSuccessHandler))
                 // 添加JWT filter
                 .addFilterBefore(authenticationTokenFilter, UsernamePasswordAuthenticationFilter.class)
+                // 家属端登录态先于后台登录态恢复
+                .addFilterBefore(memberTokenAuthenticationFilter, JwtAuthenticationTokenFilter.class)
                 // 添加CORS filter
                 .addFilterBefore(corsFilter, JwtAuthenticationTokenFilter.class)
                 .addFilterBefore(corsFilter, LogoutFilter.class)

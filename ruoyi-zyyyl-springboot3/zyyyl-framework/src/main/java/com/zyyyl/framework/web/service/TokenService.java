@@ -121,6 +121,46 @@ public class TokenService {
     }
 
     /**
+     * 创建家属端令牌。家属端登录态使用独立缓存命名空间，避免与后台登录态互相覆盖。
+     *
+     * @param loginUser 家属端登录信息
+     * @param namespace 缓存命名空间，固定使用 {@link CacheConstants#MEMBER_LOGIN_TOKEN_KEY}
+     * @return 令牌
+     */
+    public String createToken(LoginUser loginUser, String namespace) {
+        String token = IdUtils.fastUUID();
+        loginUser.setToken(token);
+        setUserAgent(loginUser);
+        refreshToken(loginUser, namespace);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(Constants.LOGIN_USER_KEY, token);
+        return createToken(claims);
+    }
+
+    /**
+     * 从指定命名空间读取登录用户
+     *
+     * @param token     令牌（可带 Bearer 前缀）
+     * @param namespace 缓存命名空间
+     * @return 登录用户，令牌无效时返回 null
+     */
+    public LoginUser getLoginUserFromNamespace(String token, String namespace) {
+        if (StringUtils.isEmpty(token)) {
+            return null;
+        }
+        try {
+            if (token.startsWith(Constants.TOKEN_PREFIX)) {
+                token = token.replace(Constants.TOKEN_PREFIX, "");
+            }
+            Claims claims = parseToken(token);
+            String uuid = (String) claims.get(Constants.LOGIN_USER_KEY);
+            return CacheUtils.get(namespace, uuid, LoginUser.class);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
      * 验证令牌有效期，相差不足20分钟，自动刷新缓存
      *
      * @param loginUser
@@ -140,10 +180,20 @@ public class TokenService {
      * @param loginUser 登录信息
      */
     public void refreshToken(LoginUser loginUser) {
+        refreshToken(loginUser, CacheConstants.LOGIN_TOKEN_KEY);
+    }
+
+    /**
+     * 刷新令牌有效期到指定命名空间
+     *
+     * @param loginUser 登录信息
+     * @param namespace 缓存命名空间
+     */
+    public void refreshToken(LoginUser loginUser, String namespace) {
         loginUser.setLoginTime(System.currentTimeMillis());
         loginUser.setExpireTime(loginUser.getLoginTime() + expireTime * MILLIS_MINUTE);
         // 根据uuid将loginUser缓存
-        CacheUtils.put(CacheConstants.LOGIN_TOKEN_KEY, loginUser.getToken(), loginUser, expireTime, TimeUnit.MINUTES);
+        CacheUtils.put(namespace, loginUser.getToken(), loginUser, expireTime, TimeUnit.MINUTES);
     }
 
     /**

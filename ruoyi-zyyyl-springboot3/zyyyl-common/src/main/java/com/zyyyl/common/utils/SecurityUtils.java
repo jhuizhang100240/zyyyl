@@ -79,6 +79,15 @@ public class SecurityUtils {
     }
 
     /**
+     * 当前请求是否为家属端登录态。家属端接口用它拒绝后台 token 越权访问。
+     *
+     * @return true=家属端登录态
+     */
+    public static boolean isMemberLogin() {
+        return "member".equals(getLoginUser().getLoginType());
+    }
+
+    /**
      * 获取Authentication
      */
     public static Authentication getAuthentication() {

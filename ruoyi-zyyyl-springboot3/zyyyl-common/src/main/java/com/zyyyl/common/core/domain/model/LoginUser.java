@@ -78,6 +78,11 @@ public class LoginUser implements UserDetails {
      */
     private SysUser user;
 
+    /**
+     * 登录类型：admin=后台用户，member=家属端用户
+     */
+    private String loginType;
+
     public LoginUser() {
     }
 
