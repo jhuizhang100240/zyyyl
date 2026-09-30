@@ -3,6 +3,7 @@ package com.zyyyl.nursing.service.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.mybatisflex.core.query.QueryWrapper;
 import com.mybatisflex.spring.service.impl.ServiceImpl;
 import com.zyyyl.common.exception.ServiceException;
 import com.zyyyl.common.utils.JSON;
@@ -21,6 +23,7 @@ import com.zyyyl.common.utils.uuid.IdUtils;
 import com.zyyyl.nursing.domain.Bed;
 import com.zyyyl.nursing.domain.CheckIn;
 import com.zyyyl.nursing.domain.CheckInConfig;
+import com.zyyyl.nursing.domain.CheckInFamily;
 import com.zyyyl.nursing.domain.Contract;
 import com.zyyyl.nursing.domain.Elder;
 import com.zyyyl.nursing.dto.CheckInApplyDto;
@@ -29,6 +32,7 @@ import com.zyyyl.nursing.dto.CheckInContractDto;
 import com.zyyyl.nursing.dto.CheckInElderDto;
 import com.zyyyl.nursing.mapper.BedMapper;
 import com.zyyyl.nursing.mapper.CheckInConfigMapper;
+import com.zyyyl.nursing.mapper.CheckInFamilyMapper;
 import com.zyyyl.nursing.mapper.CheckInMapper;
 import com.zyyyl.nursing.mapper.ContractMapper;
 import com.zyyyl.nursing.mapper.ElderMapper;
@@ -52,6 +56,9 @@ public class CheckInServiceImpl extends ServiceImpl<CheckInMapper, CheckIn> impl
 
     @Autowired
     private ContractMapper contractMapper;
+
+    @Autowired
+    private CheckInFamilyMapper checkInFamilyMapper;
 
     @Override
     public CheckIn selectCheckInById(Long id) {
@@ -112,7 +119,7 @@ public class CheckInServiceImpl extends ServiceImpl<CheckInMapper, CheckIn> impl
         if (elder != null) {
             vo.setContract(contractMapper.selectByElderId(elder.getId()));
         }
-        vo.setElderFamilyVoList(parseFamily(checkIn.getRemark()));
+        vo.setElderFamilyVoList(resolveFamily(checkIn));
         return vo;
     }
 
@@ -272,5 +279,28 @@ public class CheckInServiceImpl extends ServiceImpl<CheckInMapper, CheckIn> impl
         } catch (Exception e) {
             throw new ServiceException("入住家属信息格式错误");
         }
+    }
+
+    /**
+     * 入住家属信息双读：优先读 check_in_family，缺失时回退 check_in.remark JSON。
+     */
+    private List<ElderFamilyVo> resolveFamily(CheckIn checkIn) {
+        List<CheckInFamily> rows = checkInFamilyMapper.selectListByQuery(
+                QueryWrapper.create()
+                        .where(CheckInFamily::getCheckInId).eq(checkIn.getId())
+                        .orderBy(CheckInFamily::getIsPrimary).desc()
+                        .orderBy(CheckInFamily::getId).asc());
+        if (rows != null && !rows.isEmpty()) {
+            List<ElderFamilyVo> result = new ArrayList<>(rows.size());
+            for (CheckInFamily row : rows) {
+                ElderFamilyVo vo = new ElderFamilyVo();
+                vo.setName(row.getFamilyName());
+                vo.setPhone(row.getPhone());
+                vo.setKinship(row.getRelation());
+                result.add(vo);
+            }
+            return result;
+        }
+        return parseFamily(checkIn.getRemark());
     }
 }

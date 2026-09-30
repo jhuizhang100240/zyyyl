@@ -1,0 +1,697 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+      养老业务表基线。与 migration/zyyyl/zyyyl-schema.sql 保持一致，
+      仅包含结构和唯一约束，不含任何真实业务数据。
+      旧库已存在这些表时，changeSet 会被标记为 MARK_RAN 并跳过。
+    -->
+
+    <changeSet id="20260930-20-create-floor" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="floor"/></not>
+        </preConditions>
+        <createTable tableName="floor" remarks="楼层表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="code" type="BIGINT"/>
+            <column name="create_time" type="DATETIME"/>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_floor_name" tableName="floor" unique="true">
+            <column name="name"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="floor"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-21-create-room-type" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="room_type"/></not>
+        </preConditions>
+        <createTable tableName="room_type" remarks="房型表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bed_count" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="price" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="introduction" type="VARCHAR(500)"/>
+            <column name="photo" type="VARCHAR(255)"/>
+            <column name="status" type="TINYINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_room_type_name" tableName="room_type" unique="true">
+            <column name="name"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="room_type"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-22-create-room" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="room"/></not>
+        </preConditions>
+        <createTable tableName="room" remarks="房间表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="sort" type="INT"/>
+            <column name="room_type_id" type="BIGINT"/>
+            <column name="floor_id" type="BIGINT"/>
+            <column name="create_time" type="DATETIME"/>
+            <column name="update_time" type="DATETIME"/>
+            <column name="is_deleted" type="TINYINT" defaultValueNumeric="0"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_room_code" tableName="room" unique="true">
+            <column name="code"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="room"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-23-create-bed" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="bed"/></not>
+        </preConditions>
+        <createTable tableName="bed" remarks="床位表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="bed_number" type="VARCHAR(255)"/>
+            <column name="bed_status" type="INT"/>
+            <column name="sort" type="INT"/>
+            <column name="room_id" type="BIGINT"/>
+            <column name="create_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_bed_bed_number" tableName="bed" unique="true">
+            <column name="bed_number"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="bed"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-24-create-elder" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="elder"/></not>
+        </preConditions>
+        <createTable tableName="elder" remarks="老人表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="image" type="VARCHAR(255)"/>
+            <column name="id_card_no" type="VARCHAR(20)"/>
+            <column name="sex" type="INT"/>
+            <column name="status" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="phone" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birthday" type="VARCHAR(50)"/>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="id_card_national_emblem_img" type="VARCHAR(255)"/>
+            <column name="id_card_portrait_img" type="VARCHAR(255)"/>
+            <column name="create_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+            <column name="bed_number" type="VARCHAR(20)"/>
+            <column name="bed_id" type="BIGINT"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="elder"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-25-create-check-in" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="check_in"/></not>
+        </preConditions>
+        <createTable tableName="check_in" remarks="入住表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="elder_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="elder_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_card_no" type="CHAR(18)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="DATE"/>
+            <column name="nursing_level_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bed_number" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="TINYINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="update_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="create_by" type="VARCHAR(50)"/>
+            <column name="update_by" type="VARCHAR(50)"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="check_in"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-26-create-check-in-config" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="check_in_config"/></not>
+        </preConditions>
+        <createTable tableName="check_in_config" remarks="入住配置表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="check_in_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nursing_level_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nursing_level_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fee_start_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fee_end_date" type="DATE"/>
+            <column name="deposit" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nursing_fee" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="bed_fee" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="insurance_payment" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="government_subsidy" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="other_fees" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="update_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="create_by" type="VARCHAR(50)"/>
+            <column name="update_by" type="VARCHAR(50)"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="check_in_config"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-27-create-contract" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="contract"/></not>
+        </preConditions>
+        <createTable tableName="contract" remarks="合同表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="elder_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contract_name" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="contract_number" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="agreement_path" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="third_party_phone" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="third_party_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="elder_name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="end_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="TINYINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="sign_date" type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="termination_submitter" type="VARCHAR(50)"/>
+            <column name="termination_date" type="DATE"/>
+            <column name="termination_agreement_path" type="VARCHAR(255)"/>
+            <column name="sort_order" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="update_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="create_by" type="VARCHAR(50)"/>
+            <column name="update_by" type="VARCHAR(50)"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="contract"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-28-create-health-assessment" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="health_assessment"/></not>
+        </preConditions>
+        <createTable tableName="health_assessment" remarks="健康评估表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="elder_name" type="VARCHAR(255)"/>
+            <column name="id_card" type="VARCHAR(255)"/>
+            <column name="health_score" type="VARCHAR(255)"/>
+            <column name="suggestion_for_admission" type="INT"/>
+            <column name="nursing_level_name" type="VARCHAR(255)"/>
+            <column name="admission_status" type="INT"/>
+            <column name="total_check_date" type="VARCHAR(64)"/>
+            <column name="assessment_time" type="DATETIME"/>
+            <column name="create_by" type="VARCHAR(255)"/>
+            <column name="create_time" type="DATETIME"/>
+            <column name="update_by" type="VARCHAR(255)"/>
+            <column name="update_time" type="DATETIME"/>
+            <column name="remark" type="TEXT"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="health_assessment"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-29-create-health-assessment-detail" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="health_assessment_detail"/></not>
+        </preConditions>
+        <createTable tableName="health_assessment_detail" remarks="健康评估详情表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="health_assessment_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="birth_date" type="DATETIME"/>
+            <column name="age" type="INT"/>
+            <column name="gender" type="INT"/>
+            <column name="risk_level" type="VARCHAR(255)"/>
+            <column name="physical_exam_institution" type="VARCHAR(255)"/>
+            <column name="physical_report_url" type="VARCHAR(255)"/>
+            <column name="report_summary" type="TEXT"/>
+            <column name="abnormal_analysis" type="TEXT"/>
+            <column name="system_score" type="VARCHAR(255)"/>
+            <column name="create_by" type="VARCHAR(255)"/>
+            <column name="create_time" type="DATETIME"/>
+            <column name="update_by" type="VARCHAR(255)"/>
+            <column name="update_time" type="DATETIME"/>
+            <column name="remark" type="TEXT"/>
+        </createTable>
+        <createIndex indexName="idx_health_detail_assessment"
+            tableName="health_assessment_detail">
+            <column name="health_assessment_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="health_assessment_detail"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-30-create-nursing-level" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="nursing_level"/></not>
+        </preConditions>
+        <createTable tableName="nursing_level" remarks="护理等级表">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="plan_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fee" type="DECIMAL(10,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="TINYINT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="VARCHAR(255)"/>
+            <column name="create_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+            <column name="update_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+        <createIndex indexName="uk_nursing_level_name" tableName="nursing_level" unique="true">
+            <column name="name"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="nursing_level"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-31-create-nursing-plan" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="nursing_plan"/></not>
+        </preConditions>
+        <createTable tableName="nursing_plan" remarks="护理计划表">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="sort_no" type="INT"/>
+            <column name="plan_name" type="VARCHAR(255)" defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="TINYINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_nursing_plan_name" tableName="nursing_plan" unique="true">
+            <column name="plan_name"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="nursing_plan"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-32-create-nursing-project" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="nursing_project"/></not>
+        </preConditions>
+        <createTable tableName="nursing_project" remarks="护理项目表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)"/>
+            <column name="order_no" type="INT"/>
+            <column name="unit" type="VARCHAR(50)"/>
+            <column name="price" type="DECIMAL(10,2)"/>
+            <column name="image" type="VARCHAR(255)"/>
+            <column name="nursing_requirement" type="VARCHAR(255)"/>
+            <column name="status" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" type="VARCHAR(50)"/>
+            <column name="update_by" type="VARCHAR(50)"/>
+            <column name="remark" type="VARCHAR(255)"/>
+            <column name="create_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP"/>
+        </createTable>
+        <createIndex indexName="uk_nursing_project_name" tableName="nursing_project" unique="true">
+            <column name="name"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="nursing_project"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-33-create-nursing-project-plan" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="nursing_project_plan"/></not>
+        </preConditions>
+        <createTable tableName="nursing_project_plan" remarks="护理计划和项目关联表">
+            <column name="id" type="INT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="plan_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execute_time" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execute_cycle" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="execute_frequency" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <rollback>
+            <dropTable tableName="nursing_project_plan"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-34-create-nursing-elder" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="nursing_elder"/></not>
+        </preConditions>
+        <createTable tableName="nursing_elder" remarks="护理员老人关联表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nursing_id" type="BIGINT"/>
+            <column name="elder_id" type="BIGINT"/>
+            <column name="create_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_nursing_elder" tableName="nursing_elder" unique="true">
+            <column name="nursing_id"/>
+            <column name="elder_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="nursing_elder"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-35-create-nursing-task" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="nursing_task"/></not>
+        </preConditions>
+        <createTable tableName="nursing_task" remarks="护理任务表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="nursing_id" type="VARCHAR(50)"/>
+            <column name="project_id" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_name" type="VARCHAR(100)"/>
+            <column name="elder_id" type="BIGINT"/>
+            <column name="elder_name" type="VARCHAR(50)"/>
+            <column name="bed_number" type="VARCHAR(255)"/>
+            <column name="estimated_server_time" type="DATETIME"/>
+            <column name="real_server_time" type="DATETIME"/>
+            <column name="mark" type="VARCHAR(2000)"/>
+            <column name="cancel_reason" type="VARCHAR(2000)"/>
+            <column name="status" type="INT"/>
+            <column name="task_image" type="VARCHAR(255)"/>
+            <column name="create_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="idx_nursing_task_lookup" tableName="nursing_task">
+            <column name="elder_id"/>
+            <column name="project_id"/>
+            <column name="estimated_server_time"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="nursing_task"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-36-create-family-member" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="family_member"/></not>
+        </preConditions>
+        <createTable tableName="family_member" remarks="老人家属">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="phone" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(100)"/>
+            <column name="avatar" type="VARCHAR(255)"/>
+            <column name="open_id" type="VARCHAR(255)"/>
+            <column name="gender" type="INT"/>
+            <column name="create_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="update_time" type="TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_family_member_phone" tableName="family_member" unique="true">
+            <column name="phone"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="family_member"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-37-create-family-member-elder" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="family_member_elder"/></not>
+        </preConditions>
+        <createTable tableName="family_member_elder" remarks="客户老人关联表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="family_member_id" type="BIGINT"/>
+            <column name="elder_id" type="BIGINT"/>
+            <column name="create_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_family_member_elder" tableName="family_member_elder"
+            unique="true">
+            <column name="family_member_id"/>
+            <column name="elder_id"/>
+        </createIndex>
+        <createIndex indexName="idx_family_elder_elder" tableName="family_member_elder">
+            <column name="elder_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="family_member_elder"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-38-create-reservation" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not><tableExists tableName="reservation"/></not>
+        </preConditions>
+        <createTable tableName="reservation" remarks="预约信息表">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="mobile" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="visitor" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_time" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_time" type="DATETIME"/>
+            <column name="create_by" type="BIGINT"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_reservation_mobile_time" tableName="reservation"
+            unique="true">
+            <column name="mobile"/>
+            <column name="time"/>
+        </createIndex>
+        <createIndex indexName="idx_reservation_time_status" tableName="reservation">
+            <column name="time"/>
+            <column name="status"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="reservation"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

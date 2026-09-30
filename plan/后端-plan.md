@@ -8,10 +8,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 当前阶段 | 阶段五：家属端与 AI 后端 |
-| 状态 | 已完成，等待用户确认进入阶段六 |
+| 当前阶段 | 阶段六：数据库迁移、索引和性能 |
+| 状态 | 已完成，等待用户确认进入阶段七 |
 | 最后更新 | 2026-09-30 |
-| 下一项任务 | B6-01：创建 `changelog-5-zhiyiyun-nursing.xml` |
+| 下一项任务 | B7-01：对照 `docs/05-API接口文档.md` 执行接口回归 |
 
 环境基线：
 
@@ -218,22 +218,28 @@
 
 **任务**
 
-- [ ] B6-01 创建 `changelog-5-zhiyiyun-nursing.xml`。
-- [ ] B6-02 新增 `check_in_family`、`nursing_task_assignee`、`care_alert_rule`、`care_alert`。
-- [ ] B6-03 为老人身份证、床位编号、合同编号和家属老人关系执行去重。
-- [ ] B6-04 创建核心唯一索引与组合索引。
-- [ ] B6-05 编写旧 `nursing_task.nursing_id` 和 `check_in.remark` 数据迁移脚本。
-- [ ] B6-06 在空库执行全部 Liquibase changeSet。
-- [ ] B6-07 在旧库快照执行迁移并校验行数、关联和状态。
-- [ ] B6-08 使用 `EXPLAIN` 验证老人、任务和预约核心查询。
+- [x] B6-01 迁移脚本按现有命名规范落在 `changelog-2-zyyyl-business.xml` 与 `changelog-6-zyyyl-migration.xml`（未新建 `changelog-5-zhiyiyun-nursing.xml`，避免重复建表与索引）。
+- [x] B6-02 新增 `check_in_family`、`care_alert_rule`、`care_alert`，并为既有 `nursing_task_assignee` 补充 `assign_status/assign_time/complete_time`。
+- [x] B6-03 为老人身份证、合同编号、家属老人关系执行去重（床位编号旧库已是唯一索引）。
+- [x] B6-04 创建核心唯一索引与组合索引：`uk_elder_id_card_no`、`uk_contract_number`、`uk_family_member_elder`、`idx_family_elder_elder`、`idx_assignee_nursing_status`。
+- [x] B6-05 编写旧 `nursing_task.nursing_id` 拆分回填与 `check_in.remark` JSON 解析回填脚本（幂等，可重复执行）。
+- [x] B6-06 在空库 `zyyyl_stage6_empty` 从零执行全部 changeSet，得到 41 张表、52 个变更集。
+- [x] B6-07 在旧库快照 `zyyyl_stage6_legacy` 执行迁移，核对行数、外键重指与去重后的关联关系。
+- [x] B6-08 使用 `EXPLAIN` 验证老人身份证、家属绑定、任务三元组、预约时段、分配人状态、合同编号六类查询均命中预期索引。
 
 **验收标准**
 
-- [ ] 空库可从零初始化。
-- [ ] 旧库迁移后核心表行数与备份一致或差异有记录。
-- [ ] 无重复合同编号和重复家属老人绑定。
-- [ ] 老人列表、护理任务和预约查询命中预期索引。
-- [ ] 每个新增 changeSet 有 rollback 并在测试库验证。
+- [x] 空库可从零初始化（`zyyyl_stage6_empty` 41 表 / 52 变更集）。
+- [x] 旧库迁移后核心表行数符合预期：老人 3→2、合同 3→2、绑定 3→2、任务 1→1。
+- [x] 无重复合同编号和重复家属老人绑定，外键已重指到保留记录。
+- [x] 老人列表、护理任务和预约查询命中预期索引（`key` 列命中预期索引，`rows=const`）。
+- [x] 每个新增 changeSet 有 rollback；用 Liquibase API 生成 17 条回滚 SQL 并在测试库执行成功，回滚后变更集从 52 降至 40、新增对象全部移除，重新启动后又恢复到 52/41。
+
+**阶段六补充说明**
+
+- 旧库中业务表由人工初始化产生，Liquibase 缺少建表定义，因此新增 `changelog-2-zyyyl-business.xml` 补齐 19 张业务表；旧库已存在时按 `MARK_RAN` 跳过。
+- 去重采用「保留最小 ID、子表外键重指、删除重复记录」策略；`check_in_family` 与 `nursing_task_assignee` 回填通过 `remark='stage6-backfill'` 标记以便回滚识别。
+- 重复执行安全：索引类 changeSet 使用 `preConditions`，回填类使用 `NOT EXISTS` 与 `remark` 标记。
 
 **依赖**
 
@@ -303,3 +309,9 @@
 | 2026-09-30 | B5-09 | 已完成 | OSS 存储桶与本地回退已实现；无 OSS 参数时启动日志确认回退本地桶，OSS 分支待 AccessKeyId 补充后实测 |
 | 2026-09-30 | B5-10 | 已完成 | RAGFlow 知识库「智颐云养老」含 2 份文档（35+17 分块），Dify 回答引用知识库内容，检索链路验证通过 |
 | 2026-09-30 | 阶段五验收 | 已完成 | 16 个 JUnit 测试通过（13 后台 + 3 家属端）；接口鉴权、Dify 流式、知识库检索、本地存储回退均完成真实环境验证 |
+| 2026-09-30 | B6-01/B6-02 | 已完成 | 补齐 19 张业务表 Liquibase 定义；新增 `check_in_family`、`care_alert_rule`、`care_alert`，并为 `nursing_task_assignee` 扩展分配状态字段 |
+| 2026-09-30 | B6-03/B6-04 | 已完成 | 老人身份证、合同编号、家属老人关系去重并建立唯一/组合索引，旧库非唯一索引升级为强唯一索引 |
+| 2026-09-30 | B6-05 | 已完成 | `nursing_task.nursing_id` 逗号拆分回填 3 条分配人记录，`check_in.remark` JSON 回填 1 条入住家属记录 |
+| 2026-09-30 | B6-06/B6-07 | 已完成 | 空库从零初始化 41 表 / 52 变更集；旧库快照迁移后行数与关联校验通过 |
+| 2026-09-30 | B6-08 | 已完成 | 六类核心查询 EXPLAIN 均命中预期索引 |
+| 2026-09-30 | 阶段六验收 | 已完成 | 回滚 SQL 在测试库真实执行成功（52→40 变更集、新增对象清零），重启后恢复 52 变更集与完整结构 |

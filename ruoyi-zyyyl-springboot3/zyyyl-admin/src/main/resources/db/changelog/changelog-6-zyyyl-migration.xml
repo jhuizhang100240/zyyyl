@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <!--
+      阶段六：新增表、去重、索引与旧数据迁移。
+      说明：所有 changeSet 均可重复执行；索引使用 preConditions 防重复创建，
+      去重与回填使用幂等 SQL，已执行的 changeSet 不再修改。
+    -->
+
+    <changeSet id="20260930-06-create-check-in-family" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="check_in"/>
+            <not>
+                <tableExists tableName="check_in_family"/>
+            </not>
+        </preConditions>
+        <createTable tableName="check_in_family" remarks="入住家属联系人">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="check_in_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="family_name" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="relation" type="VARCHAR(32)"/>
+            <column name="phone" type="VARCHAR(20)"/>
+            <column name="is_primary" type="TINYINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" type="VARCHAR(64)"/>
+            <column name="create_time" type="DATETIME"/>
+            <column name="update_by" type="VARCHAR(64)"/>
+            <column name="update_time" type="DATETIME"/>
+            <column name="remark" type="VARCHAR(500)"/>
+        </createTable>
+        <createIndex indexName="idx_check_in_family_main" tableName="check_in_family">
+            <column name="check_in_id"/>
+            <column name="is_primary"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="check_in_family"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-07-add-task-assignee-columns" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="nursing_task_assignee"/>
+            <not>
+                <columnExists tableName="nursing_task_assignee" columnName="assign_status"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="nursing_task_assignee">
+            <column name="assign_status" type="TINYINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="assign_time" type="DATETIME"/>
+            <column name="complete_time" type="DATETIME"/>
+        </addColumn>
+        <rollback>
+            <dropColumn tableName="nursing_task_assignee" columnName="assign_status"/>
+            <dropColumn tableName="nursing_task_assignee" columnName="assign_time"/>
+            <dropColumn tableName="nursing_task_assignee" columnName="complete_time"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-08-create-task-assignee-status-index" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="nursing_task_assignee"/>
+            <columnExists tableName="nursing_task_assignee" columnName="assign_status"/>
+            <not>
+                <indexExists indexName="idx_assignee_nursing_status"
+                    tableName="nursing_task_assignee"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_assignee_nursing_status"
+            tableName="nursing_task_assignee">
+            <column name="nursing_id"/>
+            <column name="assign_status"/>
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="idx_assignee_nursing_status"
+                tableName="nursing_task_assignee"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-09-create-care-alert-rule" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="care_alert_rule"/>
+            </not>
+        </preConditions>
+        <createTable tableName="care_alert_rule" remarks="风险提示规则">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="rule_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rule_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rule_type" type="VARCHAR(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="threshold_value" type="DECIMAL(10,2)"/>
+            <column name="threshold_unit" type="VARCHAR(32)"/>
+            <column name="severity" type="TINYINT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="TINYINT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" type="VARCHAR(64)"/>
+            <column name="create_time" type="DATETIME"/>
+            <column name="update_by" type="VARCHAR(64)"/>
+            <column name="update_time" type="DATETIME"/>
+            <column name="remark" type="VARCHAR(500)"/>
+        </createTable>
+        <createIndex indexName="uk_care_alert_rule_code" tableName="care_alert_rule"
+            unique="true">
+            <column name="rule_code"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="care_alert_rule"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-10-create-care-alert" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="care_alert"/>
+            </not>
+        </preConditions>
+        <createTable tableName="care_alert" remarks="护理风险提示">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="elder_id" type="BIGINT"/>
+            <column name="rule_code" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alert_title" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="alert_content" type="VARCHAR(500)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="severity" type="TINYINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_type" type="VARCHAR(32)"/>
+            <column name="source_id" type="BIGINT"/>
+            <column name="status" type="TINYINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="handle_by" type="VARCHAR(64)"/>
+            <column name="handle_time" type="DATETIME"/>
+            <column name="handle_remark" type="VARCHAR(500)"/>
+            <column name="create_time" type="DATETIME"/>
+            <column name="update_time" type="DATETIME"/>
+        </createTable>
+        <createIndex indexName="idx_alert_elder_status" tableName="care_alert">
+            <column name="elder_id"/>
+            <column name="status"/>
+        </createIndex>
+        <createIndex indexName="idx_alert_severity_status" tableName="care_alert">
+            <column name="severity"/>
+            <column name="status"/>
+        </createIndex>
+        <createIndex indexName="idx_alert_source" tableName="care_alert">
+            <column name="source_type"/>
+            <column name="source_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="care_alert"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-11-dedupe-contract-number" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="contract"/>
+            <not>
+                <indexExists indexName="uk_contract_number" tableName="contract"/>
+            </not>
+        </preConditions>
+        <sql>
+            DELETE c FROM contract c
+            JOIN (
+                SELECT contract_number, MIN(id) AS keep_id
+                FROM contract
+                WHERE contract_number IS NOT NULL AND contract_number != ''
+                GROUP BY contract_number
+                HAVING COUNT(*) &gt; 1
+            ) dup ON dup.contract_number = c.contract_number
+            WHERE c.id &lt;&gt; dup.keep_id;
+        </sql>
+        <rollback>
+            <!-- 去重删除的历史数据无法恢复，回滚只移除后续索引 -->
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-12-create-contract-number-unique-index" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="contract"/>
+            <not>
+                <indexExists indexName="uk_contract_number" tableName="contract"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="uk_contract_number" tableName="contract" unique="true">
+            <column name="contract_number"/>
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="uk_contract_number" tableName="contract"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-13-dedupe-elder-id-card" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="elder"/>
+            <not>
+                <indexExists indexName="uk_elder_id_card_no" tableName="elder"/>
+            </not>
+        </preConditions>
+        <sql>
+            CREATE TEMPORARY TABLE tmp_elder_dedupe AS
+            SELECT id_card_no, MIN(id) AS keep_id
+            FROM elder
+            WHERE id_card_no IS NOT NULL AND id_card_no != ''
+            GROUP BY id_card_no
+            HAVING COUNT(*) &gt; 1;
+
+            UPDATE check_in ci
+            JOIN tmp_elder_dedupe t ON ci.elder_id != t.keep_id
+            JOIN elder e ON e.id = ci.elder_id AND e.id_card_no = t.id_card_no
+            SET ci.elder_id = t.keep_id;
+
+            UPDATE contract c
+            JOIN tmp_elder_dedupe t ON c.elder_id != t.keep_id
+            JOIN elder e ON e.id = c.elder_id AND e.id_card_no = t.id_card_no
+            SET c.elder_id = t.keep_id;
+
+            DELETE FROM family_member_elder
+            WHERE id IN (
+                SELECT id FROM (
+                    SELECT fme.id,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY fme.family_member_id, e.id_card_no
+                               ORDER BY fme.id
+                           ) AS rn
+                    FROM family_member_elder fme
+                    JOIN elder e ON e.id = fme.elder_id
+                    WHERE e.id_card_no IS NOT NULL AND e.id_card_no != ''
+                ) ranked
+                WHERE ranked.rn &gt; 1
+            );
+
+            UPDATE family_member_elder f
+            JOIN tmp_elder_dedupe t ON f.elder_id != t.keep_id
+            JOIN elder e ON e.id = f.elder_id AND e.id_card_no = t.id_card_no
+            SET f.elder_id = t.keep_id;
+
+            UPDATE nursing_task nt
+            JOIN tmp_elder_dedupe t ON nt.elder_id != t.keep_id
+            JOIN elder e ON e.id = nt.elder_id AND e.id_card_no = t.id_card_no
+            SET nt.elder_id = t.keep_id;
+
+            DELETE e FROM elder e
+            JOIN tmp_elder_dedupe t ON e.id_card_no = t.id_card_no
+            WHERE e.id != t.keep_id;
+
+            DROP TEMPORARY TABLE tmp_elder_dedupe;
+        </sql>
+        <rollback>
+            <!-- 去重删除的历史数据无法恢复，回滚只移除后续索引 -->
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-14-create-elder-id-card-unique-index" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="elder"/>
+            <not>
+                <indexExists indexName="uk_elder_id_card_no" tableName="elder"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="uk_elder_id_card_no" tableName="elder" unique="true">
+            <column name="id_card_no"/>
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="uk_elder_id_card_no" tableName="elder"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-15-create-family-elder-indexes" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="family_member_elder"/>
+            <not>
+                <indexExists indexName="idx_family_elder_elder" tableName="family_member_elder"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_family_elder_elder" tableName="family_member_elder">
+            <column name="elder_id"/>
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="idx_family_elder_elder" tableName="family_member_elder"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-16-backfill-task-assignees" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="nursing_task"/>
+            <tableExists tableName="nursing_task_assignee"/>
+            <columnExists tableName="nursing_task_assignee" columnName="assign_status"/>
+        </preConditions>
+        <sql>
+            INSERT INTO nursing_task_assignee (task_id, nursing_id, assign_status, assign_time, remark)
+            SELECT t.id,
+                   CAST(TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(t.nursing_id, ',', n.idx), ',', -1)) AS UNSIGNED),
+                   0,
+                   NOW(),
+                   'stage6-backfill'
+            FROM nursing_task t
+            JOIN (SELECT 1 AS idx UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL SELECT 4
+                  UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL SELECT 8) n
+              ON n.idx &lt;= 1 + LENGTH(t.nursing_id) - LENGTH(REPLACE(t.nursing_id, ',', ''))
+            WHERE t.nursing_id IS NOT NULL
+              AND t.nursing_id != ''
+              AND TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(t.nursing_id, ',', n.idx), ',', -1)) REGEXP '^[0-9]+$'
+              AND NOT EXISTS (
+                  SELECT 1 FROM nursing_task_assignee a
+                  WHERE a.task_id = t.id
+                    AND a.nursing_id = CAST(TRIM(SUBSTRING_INDEX(SUBSTRING_INDEX(t.nursing_id, ',', n.idx), ',', -1)) AS UNSIGNED)
+              );
+        </sql>
+        <rollback>
+            <sql>
+                DELETE FROM nursing_task_assignee
+                WHERE remark = 'stage6-backfill';
+            </sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-18-upgrade-family-elder-unique-index" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="family_member_elder"/>
+            <not>
+                <indexExists indexName="uk_family_member_elder"
+                    tableName="family_member_elder"/>
+            </not>
+        </preConditions>
+        <sql>
+            DELETE FROM family_member_elder
+             WHERE family_member_id IS NULL
+                OR elder_id IS NULL;
+        </sql>
+        <sql>
+            DELETE FROM family_member_elder
+            WHERE id IN (
+                SELECT id FROM (
+                    SELECT id,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY family_member_id, elder_id ORDER BY id
+                           ) AS rn
+                    FROM family_member_elder
+                ) ranked
+                WHERE ranked.rn &gt; 1
+            );
+        </sql>
+        <sql>
+            ALTER TABLE family_member_elder
+                MODIFY COLUMN family_member_id BIGINT NOT NULL,
+                MODIFY COLUMN elder_id BIGINT NOT NULL;
+        </sql>
+        <createIndex indexName="uk_family_member_elder" tableName="family_member_elder"
+            unique="true">
+            <column name="family_member_id"/>
+            <column name="elder_id"/>
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="uk_family_member_elder" tableName="family_member_elder"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-17-backfill-check-in-family" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="check_in"/>
+            <tableExists tableName="check_in_family"/>
+        </preConditions>
+        <sql>
+            INSERT INTO check_in_family
+                (check_in_id, family_name, relation, phone, is_primary, create_time, remark)
+            SELECT ci.id,
+                   COALESCE(NULLIF(JSON_UNQUOTE(JSON_EXTRACT(item.value, '$.name')), 'null'), '未填写'),
+                   NULLIF(JSON_UNQUOTE(JSON_EXTRACT(item.value, '$.kinship')), 'null'),
+                   NULLIF(JSON_UNQUOTE(JSON_EXTRACT(item.value, '$.phone')), 'null'),
+                   CASE WHEN item.ord = 1 THEN 1 ELSE 0 END,
+                   NOW(),
+                   'stage6-backfill'
+            FROM check_in ci
+            JOIN JSON_TABLE(
+                    ci.remark,
+                    '$[*]' COLUMNS (
+                        ord FOR ORDINALITY,
+                        value JSON PATH '$'
+                    )
+                 ) item
+            WHERE ci.remark IS NOT NULL
+              AND ci.remark != ''
+              AND JSON_VALID(ci.remark)
+              AND NOT EXISTS (
+                  SELECT 1 FROM check_in_family f WHERE f.check_in_id = ci.id
+              );
+        </sql>
+        <rollback>
+            <sql>
+                DELETE FROM check_in_family WHERE remark = 'stage6-backfill';
+            </sql>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>
