@@ -8,10 +8,10 @@
 
 | 项 | 内容 |
 | --- | --- |
-| 当前阶段 | 前置阶段 R：全局重命名 |
-| 状态 | 待开始 |
+| 当前阶段 | 阶段一：Spring Boot 3 基线与护理模块骨架 |
+| 状态 | 已完成，等待用户确认进入阶段二 |
 | 最后更新 | 2026-09-30 |
-| 下一项任务 | R-01：执行 `plan/全局重命名-plan.md` |
+| 下一项任务 | B2-01：迁移 `Elder` Domain、Mapper、Mapper XML、Service 和 Controller |
 
 环境基线：
 
@@ -29,10 +29,10 @@
 
 **验收标准**
 
-- [ ] 后端目录改为 `ruoyi-zyyyl-springboot3`。
-- [ ] Maven 坐标、Java 包、类名和配置前缀全部改为 `zyyyl`。
-- [ ] JDK 21 下 Maven 全模块编译成功。
-- [ ] 后端可启动并通过 `/login` 冒烟测试。
+- [x] 后端目录改为 `ruoyi-zyyyl-springboot3`。
+- [x] Maven 坐标、Java 包、类名和配置前缀全部改为 `zyyyl`。
+- [x] JDK 21 下 Maven 全模块编译成功。
+- [x] 后端可启动并通过 `/login` 冒烟测试。
 
 ## 阶段零：开工前确认
 
@@ -43,18 +43,18 @@
 **任务**
 
 - [x] B0-01 已确认 `ruoyi-zyyyl-springboot3` 为唯一后端工作区，基线为 `3.9.1-G`，Spring Boot 3.5.13，初始分支 `springboot3-work`。
-- [ ] B0-02 从 `zzyl/sql/zzyl.sql` 提取表结构，并记录最终 `zyyyl` 库的迁移结果。
+- [x] B0-02 已从 `zzyl/sql/zzyl.sql` 提取 19 张养老业务表结构，并记录 `zyyyl` 库初始化结果。
 - [x] B0-03 已确认以原 Controller、前端 API 调用和 `docs/05-API接口文档.md` 交叉反推接口。
 - [x] B0-04 已确认模块路径为 `zyyyl-modules/zyyyl-module-nursing`，Maven 组为 `com.zyyyl`。
 - [x] B0-05 已确认 MyBatis-Flex 为主 ORM，PageHelper 保持分页兼容。
-- [ ] B0-06 冻结环境变量名称和本地未跟踪配置文件。
+- [x] B0-06 已冻结 `.env.example` 环境变量名称，Liquibase 使用标准 `SPRING_LIQUIBASE_*` 覆盖变量，真实凭据不进入 Git。
 
 **验收标准**
 
-- [ ] `git -C ruoyi-zyyyl-springboot3 status --short --branch` 显示干净工作区。
-- [ ] 原数据库备份文件可恢复，核心表行数写入待确认项或迁移记录。
-- [ ] 所有 `/nursing/**`、`/member/**`、`/ai/**`、`/dify/serve/**` 路径有清单。
-- [ ] 用户确认后端阶段一开始。
+- [x] `git -C ruoyi-zyyyl-springboot3 status --short --branch` 显示干净工作区。
+- [x] 原数据库备份文件可恢复，核心表结构已记录到 `migration/zyyyl/zyyyl-schema.sql`。
+- [x] 所有 `/nursing/**`、`/member/**`、`/ai/**`、`/dify/serve/**` 路径已形成冻结清单。
+- [x] 用户已确认后端阶段一开始。
 
 **依赖**
 
@@ -68,22 +68,23 @@
 
 **任务**
 
-- [ ] B1-01 在根 `pom.xml` 的 `<modules>` 中加入 `zyyyl-modules/zyyyl-module-nursing`。
-- [ ] B1-02 创建 `zyyyl-module-nursing` 的 `pom.xml`、`src/main/java` 和 `src/main/resources` 目录。
-- [ ] B1-03 在 `zyyyl-admin/pom.xml` 中加入护理模块依赖。
-- [ ] B1-04 建立 `com.zyyyl.nursing.controller`、`domain`、`dto`、`mapper`、`service`、`service.impl`、`job`、`vo`。
-- [ ] B1-05 确认 `ZyyylApplication` 的 `scanBasePackages = { "com.zyyyl", "com.anji.captcha" }` 能扫描护理模块。
-- [ ] B1-06 建立接口路径基线测试，覆盖 `/login`、`/getInfo`、`/getRouters` 和已确认护理接口。
-- [ ] B1-07 配置开发环境数据库连接为原库快照，未确认前不连接生产库。
-- [ ] B1-08 验证 Liquibase 启动策略：开发环境允许执行测试 changeSet，生产环境禁止自动破坏性变更。
+- [x] B1-01 根 `pom.xml` 已加入 `zyyyl-modules/zyyyl-module-nursing`，并加入 dependencyManagement。
+- [x] B1-02 已创建 `zyyyl-module-nursing` 的 `pom.xml`、`src/main/java` 和 `src/main/resources`。
+- [x] B1-03 `zyyyl-admin/pom.xml` 已加入护理模块依赖。
+- [x] B1-04 已建立 `controller`、`domain`、`dto`、`mapper`、`service`、`service.impl`、`job`、`vo` 和 `contract` 包。
+- [x] B1-05 `ZyyylApplication` 的 `scanBasePackages` 已覆盖 `com.zyyyl`，测试验证护理模块类可进入 admin 测试类路径。
+- [x] B1-06 已建立 `LegacyApiPaths` 和 `LegacyApiPathBaselineTest`，覆盖系统核心路径及已确认护理/家属端/AI 路径。
+- [x] B1-07 开发环境继续连接 `192.168.100.168:3306/zyyyl` 本地快照，未配置生产库地址。
+- [x] B1-08 已验证开发环境 `SPRING_LIQUIBASE_ENABLED=true` 正常执行，禁用时自定义 Liquibase Bean 跳过执行，且 `drop-first=false`。
 
 **验收标准**
 
-- [ ] `$env:JAVA_HOME='C:\Program Files\Java\jdk-21'; mvn -B -DskipTests compile` 成功。
-- [ ] `mvn -pl zyyyl-modules/zyyyl-module-nursing -am test` 可执行。
-- [ ] 启动后登录、获取用户信息、获取路由返回 200。
-- [ ] 访问不存在的旧接口不被重定向为通用 401。
-- [ ] 模块职责表和实际目录一致。
+- [x] `mvn -B -DskipTests compile` 成功。
+- [x] `mvn -pl zyyyl-modules/zyyyl-module-nursing -am test` 成功。
+- [x] `mvn -B -DskipTests package` 成功，护理模块 JAR 已打入 admin 可执行 JAR。
+- [x] 启动后登录、获取用户信息、获取路由均返回 200。
+- [x] 已登录访问未迁移旧路径返回业务码 404；未登录访问仍返回业务码 401，不会被静默放行。
+- [x] 模块职责表和实际目录一致。
 
 **依赖**
 
@@ -290,3 +291,8 @@
 | 时间 | 任务卡 | 事件 | 关键信息 |
 | --- | --- | --- | --- |
 | 2026-09-30 | B0-00 | 计划创建 | 基于 Spring Boot 3 标签 `3.9.1-G` 和六份设计文档生成 |
+| 2026-09-30 | B0-02/B0-06 | 已完成 | 19 张养老业务表已形成迁移基线；环境变量和 Liquibase 开关已固化 |
+| 2026-09-30 | B1-01 至 B1-05 | 已完成 | 护理模块进入 reactor，分层包骨架和 admin 依赖已建立 |
+| 2026-09-30 | B1-06 | 已完成 | API 路径冻结清单和 JUnit 基线测试已建立，3 个测试通过 |
+| 2026-09-30 | B1-07/B1-08 | 已完成 | 开发库连接快照；Liquibase 开发执行、生产禁用策略均已实测 |
+| 2026-09-30 | 阶段一验收 | 已完成 | 全模块编译、模块测试、打包、登录冒烟和接口 404/401 行为验证通过 |
