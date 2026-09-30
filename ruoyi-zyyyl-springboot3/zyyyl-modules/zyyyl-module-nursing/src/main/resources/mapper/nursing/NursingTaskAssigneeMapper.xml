@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.NursingTaskAssigneeMapper">
+
+    <insert id="batchInsert">
+        insert into nursing_task_assignee (task_id, nursing_id, create_time)
+        values
+        <foreach item="nursingId" collection="nursingIds" separator=",">
+            (#{taskId}, #{nursingId}, now())
+        </foreach>
+    </insert>
+
+    <select id="selectNursingIdsByTaskId" resultType="long">
+        select nursing_id
+        from nursing_task_assignee
+        where task_id = #{taskId}
+        order by id
+    </select>
+
+    <delete id="deleteByTaskIds">
+        delete from nursing_task_assignee
+        where task_id in
+        <foreach collection="taskIds" item="taskId" open="(" separator="," close=")">
+            #{taskId}
+        </foreach>
+    </delete>
+
+</mapper>

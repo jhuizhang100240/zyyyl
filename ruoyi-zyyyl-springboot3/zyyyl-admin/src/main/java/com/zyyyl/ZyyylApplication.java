@@ -11,6 +11,7 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
  * 启动程序
@@ -18,6 +19,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @author geek
  */
 @EnableAsync
+@EnableScheduling
 @EnableCaching
 @MapperScan(basePackages = { "com.zyyyl.**.mapper" })
 @SpringBootApplication(exclude = { DataSourceAutoConfiguration.class }, scanBasePackages = { "com.zyyyl", "com.anji.captcha" })

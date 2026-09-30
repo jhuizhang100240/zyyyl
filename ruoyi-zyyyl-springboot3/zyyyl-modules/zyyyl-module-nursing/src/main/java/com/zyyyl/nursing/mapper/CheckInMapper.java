@@ -12,4 +12,6 @@ public interface CheckInMapper extends BaseMapper<CheckIn> {
     List<CheckIn> selectCheckInList(CheckIn checkIn);
 
     int updateHealthAssessmentStatus(@Param("idCardNo") String idCardNo);
+
+    CheckIn selectLatestByElderId(@Param("elderId") Long elderId);
 }

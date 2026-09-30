@@ -50,4 +50,14 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
           and admission_status = 1
     </update>
 
+    <select id="selectLatestByElderId" resultMap="CheckInResult">
+        select id, elder_name, elder_id, id_card_no, start_date, end_date,
+               nursing_level_name, bed_number, status, sort_order, remark,
+               create_by, create_time, update_by, update_time
+        from check_in
+        where elder_id = #{elderId}
+        order by status asc, start_date desc, id desc
+        limit 1
+    </select>
+
 </mapper>

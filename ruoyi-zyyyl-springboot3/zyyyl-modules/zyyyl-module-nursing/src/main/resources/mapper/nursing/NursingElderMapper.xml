@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.NursingElderMapper">
+
+    <select id="selectNursingIdsByElderId" resultType="long">
+        select nursing_id
+        from nursing_elder
+        where elder_id = #{elderId}
+          and nursing_id is not null
+        order by id
+    </select>
+
+</mapper>
