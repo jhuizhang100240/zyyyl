@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.HealthAssessmentMapper">
+
+    <resultMap id="HealthAssessmentResult" type="com.zyyyl.nursing.domain.HealthAssessment">
+        <id property="id" column="id"/>
+        <result property="elderName" column="elder_name"/>
+        <result property="idCard" column="id_card"/>
+        <result property="healthScore" column="health_score"/>
+        <result property="suggestionForAdmission" column="suggestion_for_admission"/>
+        <result property="nursingLevelName" column="nursing_level_name"/>
+        <result property="admissionStatus" column="admission_status"/>
+        <result property="totalCheckDate" column="total_check_date"/>
+        <result property="assessmentTime" column="assessment_time"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="selectHealthAssessmentList" parameterType="com.zyyyl.nursing.domain.HealthAssessment"
+            resultMap="HealthAssessmentResult">
+        select id, elder_name, id_card, health_score, suggestion_for_admission,
+               nursing_level_name, admission_status, total_check_date, assessment_time,
+               create_by, create_time, update_by, update_time, remark
+        from health_assessment
+        <where>
+            <if test="elderName != null and elderName != ''">
+                and elder_name like concat('%', #{elderName}, '%')
+            </if>
+            <if test="idCard != null and idCard != ''">and id_card = #{idCard}</if>
+            <if test="healthScore != null and healthScore != ''">and health_score = #{healthScore}</if>
+            <if test="suggestionForAdmission != null">and suggestion_for_admission = #{suggestionForAdmission}</if>
+            <if test="nursingLevelName != null and nursingLevelName != ''">
+                and nursing_level_name like concat('%', #{nursingLevelName}, '%')
+            </if>
+            <if test="admissionStatus != null">and admission_status = #{admissionStatus}</if>
+            <if test="totalCheckDate != null and totalCheckDate != ''">and total_check_date = #{totalCheckDate}</if>
+            <if test="assessmentTime != null">and assessment_time = #{assessmentTime}</if>
+        </where>
+        order by id desc
+    </select>
+
+</mapper>

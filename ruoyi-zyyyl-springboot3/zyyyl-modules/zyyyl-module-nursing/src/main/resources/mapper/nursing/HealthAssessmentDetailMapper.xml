@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zyyyl.nursing.mapper.HealthAssessmentDetailMapper">
+
+    <resultMap id="HealthAssessmentDetailResult" type="com.zyyyl.nursing.domain.HealthAssessmentDetail">
+        <id property="id" column="id"/>
+        <result property="healthAssessmentId" column="health_assessment_id"/>
+        <result property="birthDate" column="birth_date"/>
+        <result property="age" column="age"/>
+        <result property="gender" column="gender"/>
+        <result property="riskLevel" column="risk_level"/>
+        <result property="physicalExamInstitution" column="physical_exam_institution"/>
+        <result property="physicalReportUrl" column="physical_report_url"/>
+        <result property="reportSummary" column="report_summary"/>
+        <result property="abnormalAnalysis" column="abnormal_analysis"/>
+        <result property="systemScore" column="system_score"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="remark" column="remark"/>
+    </resultMap>
+
+    <select id="selectByAssessmentId" resultMap="HealthAssessmentDetailResult">
+        select id, health_assessment_id, birth_date, age, gender, risk_level,
+               physical_exam_institution, physical_report_url, report_summary,
+               abnormal_analysis, system_score, create_by, create_time,
+               update_by, update_time, remark
+        from health_assessment_detail
+        where health_assessment_id = #{healthAssessmentId}
+        order by id desc
+        limit 1
+    </select>
+
+    <delete id="deleteByAssessmentIds">
+        delete from health_assessment_detail
+        where health_assessment_id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
