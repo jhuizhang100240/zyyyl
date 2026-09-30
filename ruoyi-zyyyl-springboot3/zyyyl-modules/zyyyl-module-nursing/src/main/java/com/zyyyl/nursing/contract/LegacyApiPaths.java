@@ -74,6 +74,34 @@ public final class LegacyApiPaths {
             "/nursing/reservation",
             "/nursing/reservation/{ids}");
 
+    /**
+     * Original floor/room/bed endpoints used by the legacy admin frontend.
+     * The documented /nursing aliases remain mapped on the same controllers.
+     */
+    public static final List<String> LEGACY_NURSING_ALIASES = List.of(
+            "/elder/floor/getAllFloorsWithNur",
+            "/elder/floor/getRoomAndBedByBedStatus/{status}",
+            "/elder/floor/list",
+            "/elder/floor/{id}",
+            "/elder/floor",
+            "/elder/floor/{ids}",
+            "/elder/room/getRoomsWithNurByFloorId/{floorId}",
+            "/elder/room/one/{id}",
+            "/elder/room/getRoomsByFloorId/{floorId}",
+            "/elder/room/list",
+            "/elder/room/{id}",
+            "/elder/room",
+            "/elder/room/{ids}",
+            "/elder/roomType/list",
+            "/elder/roomType/listAll",
+            "/elder/roomType/{id}",
+            "/elder/roomType",
+            "/elder/roomType/{ids}",
+            "/elder/bed/list",
+            "/elder/bed/{id}",
+            "/elder/bed",
+            "/elder/bed/{ids}");
+
     public static final List<String> MEMBER = List.of(
             "/member/user/login",
             "/member/user/wx-login",
@@ -101,7 +129,7 @@ public final class LegacyApiPaths {
             "/dify/serve/getElderHealthInfo",
             "/dify/serve/getReservationByToday");
 
-    public static final List<String> ALL = Stream.of(SYSTEM, NURSING, MEMBER, AI, DIFY)
+    public static final List<String> ALL = Stream.of(SYSTEM, NURSING, LEGACY_NURSING_ALIASES, MEMBER, AI, DIFY)
             .flatMap(List::stream)
             .toList();
 }

@@ -13,6 +13,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import com.zyyyl.ZyyylApplication;
 import com.zyyyl.nursing.contract.LegacyApiPaths;
+import com.zyyyl.nursing.controller.BedController;
+import com.zyyyl.nursing.controller.FloorController;
+import com.zyyyl.nursing.controller.RoomController;
+import com.zyyyl.nursing.controller.RoomTypeController;
+import com.zyyyl.nursing.controller.ElderController;
 import com.zyyyl.web.controller.system.SysLoginController;
 
 class LegacyApiPathBaselineTest {
@@ -34,6 +39,7 @@ class LegacyApiPathBaselineTest {
         assertThat(LegacyApiPaths.MEMBER).allMatch(path -> path.startsWith("/member/"));
         assertThat(LegacyApiPaths.AI).allMatch(path -> path.startsWith("/ai/"));
         assertThat(LegacyApiPaths.DIFY).allMatch(path -> path.startsWith("/dify/serve/"));
+        assertThat(LegacyApiPaths.LEGACY_NURSING_ALIASES).allMatch(path -> path.startsWith("/elder/"));
 
         assertThat(LegacyApiPaths.NURSING).contains(
                 "/nursing/elder/list",
@@ -53,6 +59,15 @@ class LegacyApiPathBaselineTest {
         assertThat(application).isNotNull();
         assertThat(application.scanBasePackages()).contains("com.zyyyl");
         assertThat(LegacyApiPaths.ALL).contains("/nursing/checkIn/apply", "/member/user/wx-login", "/ai/chat");
+    }
+
+    @Test
+    void legacyFloorRoomAndBedAliasesRemainMapped() {
+        assertThat(controllerMappings(FloorController.class)).contains("/nursing/floor", "/elder/floor");
+        assertThat(controllerMappings(RoomController.class)).contains("/nursing/room", "/elder/room");
+        assertThat(controllerMappings(RoomTypeController.class)).contains("/nursing/roomType", "/elder/roomType");
+        assertThat(controllerMappings(BedController.class)).contains("/nursing/bed", "/elder/bed");
+        assertThat(controllerMappings(ElderController.class)).contains("/nursing/elder");
     }
 
     private static Set<String> collectRoutes(Class<?> controller) {
@@ -80,5 +95,15 @@ class LegacyApiPathBaselineTest {
         for (String path : paths) {
             routes.add(path.startsWith("/") ? path : "/" + path);
         }
+    }
+
+    private static Set<String> controllerMappings(Class<?> controller) {
+        Set<String> mappings = new LinkedHashSet<>();
+        org.springframework.web.bind.annotation.RequestMapping mapping =
+                controller.getAnnotation(org.springframework.web.bind.annotation.RequestMapping.class);
+        if (mapping != null) {
+            addPaths(mappings, mapping.value());
+        }
+        return mappings;
     }
 }
