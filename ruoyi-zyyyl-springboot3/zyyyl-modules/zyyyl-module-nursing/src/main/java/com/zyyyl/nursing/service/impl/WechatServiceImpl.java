@@ -48,12 +48,13 @@ public class WechatServiceImpl implements IWechatService {
         }
         Map<String, Object> response;
         try {
-            response = restClient.get()
+            String raw = restClient.get()
                     .uri(properties.getSessionUrl()
                             + "?appid={appid}&secret={secret}&js_code={jsCode}&grant_type=authorization_code",
                             properties.getAppId(), properties.getAppSecret(), code)
                     .retrieve()
-                    .body(Map.class);
+                    .body(String.class);
+            response = parseJsonObject(raw);
         } catch (Exception e) {
             log.error("微信 jscode2session 调用失败，code长度={}", code.length(), e);
             throw new ServiceException("微信登录服务暂时不可用");
@@ -82,11 +83,12 @@ public class WechatServiceImpl implements IWechatService {
         body.put("code", phoneCode);
         Map<String, Object> response;
         try {
-            response = restClient.post()
+            String raw = restClient.post()
                     .uri(properties.getPhoneUrl() + "?access_token={token}", token)
                     .body(body)
                     .retrieve()
-                    .body(Map.class);
+                    .body(String.class);
+            response = parseJsonObject(raw);
         } catch (Exception e) {
             log.error("微信 getuserphonenumber 调用失败", e);
             throw new ServiceException("微信手机号服务暂时不可用");
@@ -124,12 +126,13 @@ public class WechatServiceImpl implements IWechatService {
             }
             Map<String, Object> response;
             try {
-                response = restClient.get()
+                String raw = restClient.get()
                         .uri(properties.getTokenUrl()
                                 + "?grant_type=client_credential&appid={appid}&secret={secret}",
                                 properties.getAppId(), properties.getAppSecret())
                         .retrieve()
-                        .body(Map.class);
+                        .body(String.class);
+                response = parseJsonObject(raw);
             } catch (Exception e) {
                 log.error("微信 access_token 获取失败", e);
                 throw new ServiceException("微信服务暂时不可用");
@@ -153,6 +156,14 @@ public class WechatServiceImpl implements IWechatService {
         if (StringUtils.isEmpty(properties.getAppId()) || StringUtils.isEmpty(properties.getAppSecret())) {
             throw new ServiceException("微信小程序 AppId 或 AppSecret 未配置");
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> parseJsonObject(String raw) throws Exception {
+        if (StringUtils.isEmpty(raw)) {
+            return new HashMap<>();
+        }
+        return com.zyyyl.common.utils.JSON.getObjectMapper().readValue(raw, Map.class);
     }
 
     private String stringValue(Object value) {
