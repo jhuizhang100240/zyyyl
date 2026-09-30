@@ -23,4 +23,89 @@
         </rollback>
     </changeSet>
 
+    <changeSet id="20260930-02-create-nursing-task-assignee" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="nursing_task_assignee"/>
+            </not>
+        </preConditions>
+        <createTable tableName="nursing_task_assignee" remarks="护理任务分配人">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="task_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nursing_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_by" type="BIGINT"/>
+            <column name="create_time" type="DATETIME" defaultValueComputed="CURRENT_TIMESTAMP"/>
+            <column name="update_by" type="BIGINT"/>
+            <column name="update_time" type="DATETIME"/>
+            <column name="remark" type="VARCHAR(255)"/>
+        </createTable>
+        <createIndex indexName="uk_nursing_task_assignee_task_user"
+            tableName="nursing_task_assignee" unique="true">
+            <column name="task_id"/>
+            <column name="nursing_id"/>
+        </createIndex>
+        <rollback>
+            <dropTable tableName="nursing_task_assignee"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-03-create-nursing-task-lookup-index" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="nursing_task"/>
+            <not>
+                <indexExists indexName="idx_nursing_task_lookup"
+                    tableName="nursing_task"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_nursing_task_lookup" tableName="nursing_task">
+            <column name="elder_id"/>
+            <column name="project_id"/>
+            <column name="estimated_server_time"/>
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="idx_nursing_task_lookup" tableName="nursing_task"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-04-create-reservation-time-status-index" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="reservation"/>
+            <not>
+                <indexExists indexName="idx_reservation_time_status"
+                    tableName="reservation"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="idx_reservation_time_status" tableName="reservation">
+            <column name="time"/>
+            <column name="status"/>
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="idx_reservation_time_status" tableName="reservation"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260930-05-unique-reservation-mobile-time" author="zyyyl">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="reservation"/>
+            <not>
+                <indexExists indexName="uk_reservation_mobile_time"
+                    tableName="reservation"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="uk_reservation_mobile_time" tableName="reservation"
+            unique="true">
+            <column name="mobile"/>
+            <column name="time"/>
+        </createIndex>
+        <rollback>
+            <dropIndex indexName="uk_reservation_mobile_time" tableName="reservation"/>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>

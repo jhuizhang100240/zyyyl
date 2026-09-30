@@ -14,6 +14,11 @@ zyyyl:
   captchaType: math
   # 指定默认文件上传方法最大文件大小(MB)
   fileMaxSize: 50
+  scheduling:
+    enabled: ${ZYYYL_SCHEDULING_ENABLED:true}
+    task-cron: ${ZYYYL_TASK_CRON:0 0 1 1 * *}
+    reservation-cron: ${ZYYYL_RESERVATION_CRON:0 1,31 * * * *}
+    contract-cron: ${ZYYYL_CONTRACT_CRON:0 0 1 * * *}
 
 # 开发环境配置
 server:
