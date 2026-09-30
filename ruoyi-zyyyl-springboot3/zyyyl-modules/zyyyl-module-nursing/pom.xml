@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.zyyyl</groupId>
+        <artifactId>zyyyl</artifactId>
+        <version>3.9.1-G</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <artifactId>zyyyl-module-nursing</artifactId>
+    <description>智颐云养老护理业务模块</description>
+
+    <dependencies>
+        <!-- 通用工具、响应对象和基础注解 -->
+        <dependency>
+            <groupId>com.zyyyl</groupId>
+            <artifactId>zyyyl-common</artifactId>
+        </dependency>
+
+        <!-- Web、Security、数据源和系统模块基础设施 -->
+        <dependency>
+            <groupId>com.zyyyl</groupId>
+            <artifactId>zyyyl-framework</artifactId>
+        </dependency>
+
+        <!-- 模块级单元测试 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>

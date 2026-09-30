@@ -54,6 +54,12 @@
             <artifactId>zyyyl-framework</artifactId>
         </dependency>
 
+        <!-- 养老业务模块 -->
+        <dependency>
+            <groupId>com.zyyyl</groupId>
+            <artifactId>zyyyl-module-nursing</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>

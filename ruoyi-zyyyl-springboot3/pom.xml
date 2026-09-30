@@ -224,6 +224,13 @@
                 <artifactId>zyyyl-system</artifactId>
                 <version>${zyyyl.version}</version>
             </dependency>
+
+            <!-- 养老业务模块 -->
+            <dependency>
+                <groupId>com.zyyyl</groupId>
+                <artifactId>zyyyl-module-nursing</artifactId>
+                <version>${zyyyl.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -232,6 +239,7 @@
         <module>zyyyl-framework</module>
         <module>zyyyl-system</module>
         <module>zyyyl-common</module>
+        <module>zyyyl-modules/zyyyl-module-nursing</module>
     </modules>
     <packaging>pom</packaging>
 
