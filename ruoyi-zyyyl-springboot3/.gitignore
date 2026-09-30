@@ -53,12 +53,12 @@ nbdist/
 effective-pom.xml
 
 
-./geek-modules/
-!./geek-modules/.gitkeep
-./geek-plugins/
-!./geek-plugins/.gitkeep
-./geek-scenes/
-!./geek-scenes/.gitkeep
+./zyyyl-modules/
+!./zyyyl-modules/.gitkeep
+./zyyyl-plugins/
+!./zyyyl-plugins/.gitkeep
+./zyyyl-scenes/
+!./zyyyl-scenes/.gitkeep
 
 !dependency-list.txt
 !dependency-tree.txt
